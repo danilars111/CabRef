@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CabRef</title>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+<h1 th:inline="text">Hello [[${login}]]! Welcome to CabRef!</h1>
+
+<form th:action="@{cabref/addNew}" method="post">
+   <p>
+   <input type="submit" value="Add New"  class="btn btn-info"/>
+   Key: <input type="text" name="key"/>
+   </p>
+   <input type="hidden" name="login" th:value="${login}"/>
+</form>
+<h2>List of Literature Entries</h2>
+<table class="table">
+  <tr>
+    <th>Key</th>
+    <th>Type</th>
+    <th>Author</th>
+    <th>Title</th>
+    <th>Journal</th>
+    <th>Volume</th>
+    <th>Number</th>
+    <th>Year</th>
+  </tr>
+  <tr th:each="entry : ${entries}">
+    <td><a th:href="@{'cabref/'+${entry.key}(login=${login})}" style="display:block;" th:inline="text">[[${entry.key}]]</a></td>
+    <td th:text="${entry.type}">article</td>
+    <td th:text="${entry.author}">author</td>
+    <td th:text="${entry.title}">title</td>
+    <td th:text="${entry.journal}">journal</td>
+    <td th:text="${entry.volume}">volume</td>
+    <td th:text="${entry.number}">number</td>
+    <td th:text="${entry.year}">year</td>
+  </tr>
+</table>
+</div>
+</body>
+</html>
