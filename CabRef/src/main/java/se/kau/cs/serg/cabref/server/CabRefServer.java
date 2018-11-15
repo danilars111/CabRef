@@ -3,19 +3,29 @@ package se.kau.cs.serg.cabref.server;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Globals;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -215,6 +225,24 @@ public class CabRefServer {
 		} catch (SaveException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public synchronized void importFromDiVa(String id)  
+	{
+		JabRefPreferences jrp = JabRefPreferences.getInstance();
+		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
+		
+		BibEntry newEntry = divaImporter.getEntry(id);
+		
+		ParserResult parserResult = readEntriesFromFile();
+		parserResult.getDatabase().insertEntry(newEntry);
+		
+		writeDataToDisk(parserResult.getDatabaseContext());
+		
+		
+		
+		
+		
 	}
 
 }
