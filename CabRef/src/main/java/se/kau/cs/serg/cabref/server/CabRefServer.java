@@ -1,14 +1,18 @@
 package se.kau.cs.serg.cabref.server;
 
+import java.beans.Encoder;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +37,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 import se.kau.cs.serg.cabref.beans.BibEntryBean;
 import spark.Spark;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.Elements;
 
 /**
  * Central server class that builds on JabRef and processes requests
@@ -229,6 +236,52 @@ public class CabRefServer {
 	
 	public synchronized boolean importFromDiVa(String id)  
 	{
+		// TODO: refactor functionality to smaller functions
+		Document doc = new Document("");
+		boolean hasMatch = false;
+		String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
+		
+		try {
+			doc = Jsoup.connect(searchURL).get();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		searchURL = "http://kau.diva-portal.org" + doc.getElementsByClass("ui-datalist-item").first()
+				.select("a").first().attr("href");
+		try {
+			doc = Jsoup.connect(searchURL).get();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Check if page contains ID
+		System.out.println("ID to search for: " + id);
+		Elements ids = doc.getElementsByClass("singleRow");
+		for(Iterator<Element> i = ids.iterator(); i.hasNext();) {
+			Element el = i.next();
+			if(!el.getElementsContainingOwnText(id).isEmpty()) {
+				hasMatch = true;
+				break;
+			}
+		}
+		if(!hasMatch) {
+			System.out.println("Didn't find any matching IDs under Identifiers on webpage");
+			return false;
+		}
+		
+		// Parse diva2-id
+		id = doc.getElementsContainingOwnText("DiVA, id:").first()
+			.select("a").first().attr("href").split("=")[1];
+		try {
+			id = URLDecoder.decode(id, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
 		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
 		
