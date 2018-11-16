@@ -25,6 +25,7 @@ public class RouteSetup {
 
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
 		post("/cabref/importFromDiVa", (req, res) -> importFromDiVa(req, res, server));
+		post("/cabref/export", (req, res) -> export(req, res, server));
 
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		// unfortunately, delete and put cannot be called from thymeleaf, so we
@@ -63,6 +64,13 @@ public class RouteSetup {
 			res.redirect("/cabref" + "?login=" + req.queryParams("login"));
 		}
 		
+		return "";
+	}
+	
+	private static Object export(Request req, Response res, CabRefServer server) 
+	{
+		server.export();
+		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
 		return "";
 	}
 	
