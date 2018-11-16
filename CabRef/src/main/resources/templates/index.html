@@ -26,6 +26,13 @@
    <input type="hidden" name="login" th:value="${login}"/>
 </form>
 
+<form th:action="@{cabref/export}" method="post">
+   <p>
+   <input type="submit" value="Export"  class="btn btn-info"/>
+   </p>
+   <input type="hidden" name="login" th:value="${login}"/>
+</form>
+
 <h2>List of Literature Entries</h2>
 <table class="table">
   <tr>

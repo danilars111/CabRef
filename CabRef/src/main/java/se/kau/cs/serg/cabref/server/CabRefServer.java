@@ -19,7 +19,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.Globals;
+import org.jabref.gui.exporter.ExportAction;
+import org.jabref.logic.exporter.BibTeXMLExportFormat;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
@@ -51,6 +54,7 @@ public class CabRefServer {
 	 * The final path that points to the reference file of this server
 	 */
 	private static final String filePath = "src/main/resources/bib/simple-file.bib";
+	
 
 	/**
 	 * The file of accepted users
@@ -297,6 +301,37 @@ public class CabRefServer {
 		writeDataToDisk(parserResult.getDatabaseContext());
 		
 		return true;
+		
+	}
+	
+	public synchronized void export() 
+	{
+		ParserResult parserResult = readEntriesFromFile();
+		BibDatabaseContext context = parserResult.getDatabaseContext();
+		
+		JabRefPreferences jrp = JabRefPreferences.getInstance();
+		
+		
+		/*ExportFormat format = new ExportFormat("BibTex", "bibtex", null, null, ".bib" );
+		 
+		try {
+			format.performExport(context, "C:\\Users\\marti\\Desktop\\export.bib" ,
+									context.getMetaData().getEncoding().get(),
+									context.getEntries());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} */
+		
+		BibTeXMLExportFormat format = new BibTeXMLExportFormat();
+		try {
+			format.performExport(context, "C:\\Users\\marti\\Desktop\\export.xml", 
+					context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
+					context.getEntries());
+		} catch (SaveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
