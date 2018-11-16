@@ -6,6 +6,9 @@
    <title>CabRef</title>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
+<style>
+	input[type=text] {width: 200px}
+</style>
 <body>
 <div class="container">
 <h1 th:inline="text">Hello [[${login}]]! Welcome to CabRef!</h1>
@@ -29,6 +32,7 @@
 <form th:action="@{cabref/export}" method="post">
    <p>
    <input type="submit" value="Export"  class="btn btn-info"/>
+   Export directory: <input type="text" name="path" placeholder="(default: working directory)"/>
    </p>
    <input type="hidden" name="login" th:value="${login}"/>
 </form>

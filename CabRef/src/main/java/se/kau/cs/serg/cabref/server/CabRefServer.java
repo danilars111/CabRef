@@ -304,7 +304,7 @@ public class CabRefServer {
 		
 	}
 	
-	public synchronized void export() 
+	public synchronized void export(String path) 
 	{
 		ParserResult parserResult = readEntriesFromFile();
 		BibDatabaseContext context = parserResult.getDatabaseContext();
@@ -323,11 +323,25 @@ public class CabRefServer {
 			e.printStackTrace();
 		} */
 		
-		BibTeXMLExportFormat format = new BibTeXMLExportFormat();
+		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
+		BibtexExportFormat BibFormat = new BibtexExportFormat();
+		
+		if(path.isEmpty()) {
+			path = System.getProperty("user.dir");
+		}
+		
 		try {
-			format.performExport(context, "C:\\Users\\marti\\Desktop\\export.xml", 
-					context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
-					context.getEntries());
+				System.out.println(path + "/export.xml");
+				XMLformat.performExport(
+						context, path + "/export.xml",
+						context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
+						context.getEntries()
+						);
+				BibFormat.performExport(
+						context, path + "/export.bib",
+						context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
+						context.getEntries()
+						);
 		} catch (SaveException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

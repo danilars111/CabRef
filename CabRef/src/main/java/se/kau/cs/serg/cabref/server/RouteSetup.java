@@ -69,7 +69,7 @@ public class RouteSetup {
 	
 	private static Object export(Request req, Response res, CabRefServer server) 
 	{
-		server.export();
+		server.export(req.queryParams("path"));
 		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
 		return "";
 	}
