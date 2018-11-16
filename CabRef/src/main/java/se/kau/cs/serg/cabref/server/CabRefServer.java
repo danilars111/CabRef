@@ -240,6 +240,7 @@ public class CabRefServer {
 		Document doc = new Document("");
 		boolean hasMatch = false;
 		String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
+		System.out.println(searchURL);
 		
 		try {
 			doc = Jsoup.connect(searchURL).get();
