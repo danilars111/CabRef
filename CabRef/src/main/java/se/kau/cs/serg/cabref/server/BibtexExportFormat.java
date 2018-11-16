@@ -60,7 +60,6 @@ public class BibtexExportFormat extends ExportFormat {
 			}
 		}
 		stringEntry += "}\n";
-		System.out.print(stringEntry);
 		try {
 			fw.write(stringEntry);
 		} catch (IOException e) {
