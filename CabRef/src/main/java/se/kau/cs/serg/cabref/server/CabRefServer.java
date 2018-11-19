@@ -241,57 +241,16 @@ public class CabRefServer {
 		}
 	}
 	
-	public synchronized boolean importFromDiVa(String id)  
-	{
-		// TODO: refactor functionality to smaller functions
-		Document doc = new Document("");
-		boolean hasMatch = false;
-		String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
-		System.out.println(searchURL);
-		
-		try {
-			doc = Jsoup.connect(searchURL).get();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		searchURL = "http://kau.diva-portal.org" + doc.getElementsByClass("ui-datalist-item").first()
-				.select("a").first().attr("href");
-		try {
-			doc = Jsoup.connect(searchURL).get();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		// Check if page contains ID
-		System.out.println("ID to search for: " + id);
-		Elements ids = doc.getElementsByClass("singleRow");
-		for(Iterator<Element> i = ids.iterator(); i.hasNext();) {
-			Element el = i.next();
-			if(!el.getElementsContainingOwnText(id).isEmpty()) {
-				hasMatch = true;
-				break;
-			}
-		}
-		if(!hasMatch) {
-			System.out.println("Didn't find any matching IDs under Identifiers on webpage");
-			return false;
-		}
-		
-		// Parse diva2-id
-		id = doc.getElementsContainingOwnText("DiVA, id:").first()
-			.select("a").first().attr("href").split("=")[1];
-		try {
-			id = URLDecoder.decode(id, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public synchronized boolean importFromDiVa(String id)
+	{	
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
 		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
+		
+		id = divaImporter.retrieveDiVaId(id);
+		
+		if(id == null) {
+			return false;
+		}
 		
 		BibEntry newEntry = divaImporter.getEntry(id);
 		if(newEntry == null) {

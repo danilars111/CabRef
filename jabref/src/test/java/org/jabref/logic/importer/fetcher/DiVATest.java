@@ -59,11 +59,11 @@ public class DiVATest {
 
     @Test
     public void testValidIdentifier() {
-        assertTrue(fetcher.isValidId("diva2:260746"));
+        assertTrue(fetcher.isValidDiVaId("diva2:260746"));
     }
 
     @Test
     public void testInvalidIdentifier() {
-        assertFalse(fetcher.isValidId("banana"));
+        assertFalse(fetcher.isValidDiVaId("banana"));
     }
 }
