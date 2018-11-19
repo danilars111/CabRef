@@ -1,4 +1,4 @@
-package se.kau.cs.serg.cabref.server;
+package org.jabref.gui.exporter;
 
 import java.io.File;
 import java.io.FileWriter;

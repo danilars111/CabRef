@@ -118,15 +118,22 @@ public class DiVA implements IdBasedParserFetcher {
         String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
         System.out.println(searchURL);
 
-        Document doc = fetchHtmlPage(searchURL);
-        boolean hasMatch = checkIfPageHasId(id, doc);
-
-        if (hasMatch) {
-            return parseDiVaId(id, doc);
-        } else {
+        if (!isValidId(id)) {
             return null;
         }
 
+        else {
+            Document doc = fetchHtmlPage(searchURL);
+            boolean hasMatch = checkIfPageHasId(id, doc);
+
+            if (hasMatch) {
+                return parseDiVaId(id, doc);
+            }
+
+            else {
+                return null;
+            }
+        }
     }
 
     private Document fetchHtmlPage(String url) {
@@ -152,9 +159,7 @@ public class DiVA implements IdBasedParserFetcher {
 
     private boolean checkIfPageHasId(String id, Document doc) {
         // Check if page contains ID
-        if (!isValidId(id)) {
-            return false;
-        }
+
 
         System.out.println("ID to search for: " + id);
         Elements ids = doc.getElementsByClass("singleRow");
