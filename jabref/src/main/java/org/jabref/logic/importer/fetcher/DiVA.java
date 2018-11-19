@@ -2,10 +2,13 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.help.HelpFile;
@@ -19,6 +22,10 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /*
  * http://www.diva-portal.org/smash/aboutdiva.jsf?dswid=-3222
@@ -59,14 +66,14 @@ public class DiVA implements IdBasedParserFetcher {
         return new BibtexParser(importFormatPreferences);
     }
 
-    public boolean isValidId(String identifier) {
+    public boolean isValidDiVaId(String identifier) {
         return identifier.startsWith("diva2:");
     }
 
     public BibEntry getEntry(String id) {
         BibEntry newEntry = null;
 
-        if (isValidId(id)) {
+        if (isValidDiVaId(id)) {
             URL citationPageURL;
 
 
@@ -102,8 +109,93 @@ public class DiVA implements IdBasedParserFetcher {
 
             BibEntry entry = entries.iterator().next();
             return entry;
+        }
+    }
 
+    public String retrieveDiVaId(String id) {
+
+        // TODO: refactor functionality to smaller functions
+        String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
+        System.out.println(searchURL);
+
+        Document doc = fetchHtmlPage(searchURL);
+        boolean hasMatch = checkIfPageHasId(id, doc);
+
+        if (hasMatch) {
+            return parseDiVaId(id, doc);
+        } else {
+            return null;
+        }
+
+    }
+
+    private Document fetchHtmlPage(String url) {
+        Document doc = new Document("");
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+        url = "http://kau.diva-portal.org" + doc.getElementsByClass("ui-datalist-item").first()
+                .select("a").first().attr("href");
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+        return doc;
+    }
+
+    private boolean checkIfPageHasId(String id, Document doc) {
+        // Check if page contains ID
+        if (!isValidId(id)) {
+            return false;
+        }
+
+        System.out.println("ID to search for: " + id);
+        Elements ids = doc.getElementsByClass("singleRow");
+        for (Iterator<Element> i = ids.iterator(); i.hasNext();) {
+            Element el = i.next();
+            if (!el.getElementsContainingOwnText(id).isEmpty()) {
+                return true;
             }
+        }
+        System.out.println("Didn't find any matching IDs under Identifiers on webpage");
+        return false;
+    }
+
+    private String parseDiVaId(String id, Document doc) {
+        // Parse diva2-id
+        id = doc.getElementsContainingOwnText("DiVA, id:").first()
+                .select("a").first().attr("href").split("=")[1];
+        try {
+            id = URLDecoder.decode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+    private boolean isValidId(String id) {
+
+        if (id.startsWith("diva2:")) {
+            return true;
+        } else if (id.startsWith("10.")) {
+            return true;
+        } else if (id.startsWith("978-") || id.startsWith("979-")) {
+            return true;
+        } else if (id.startsWith("oai:")) {
+            return true;
+        } else if (id.startsWith("urn:")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
