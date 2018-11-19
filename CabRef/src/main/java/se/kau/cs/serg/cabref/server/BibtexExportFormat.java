@@ -10,6 +10,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,31 +19,18 @@ import org.jabref.model.entry.BibEntry;
 
 public class BibtexExportFormat extends ExportFormat {
 
-	@Override
-    public void performExport(final BibDatabaseContext databaseContext, final String resultFile, final Charset encoding,
-            List<BibEntry> entries) throws SaveException {
-		try {
-			FileWriter fw = new FileWriter(resultFile);
-			Objects.requireNonNull(databaseContext);
-	        Objects.requireNonNull(entries);
-	        
-	        if (entries.isEmpty()) { // Only export if entries exist
-	        	fw.close();
-	            return;
-	        }
-	        
-	        for (BibEntry bibEntry : entries) {
-	            writeEntryToFile(bibEntry, fw);
-	        }
-	        
-	        fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public String exportAsString(final BibDatabaseContext databaseContext, List<BibEntry> entries) throws SaveException {
+		String exportString = "";
+		Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        
+        for (BibEntry bibEntry : entries) {
+            exportString += parseEntry(bibEntry);
+        }
+        return exportString;
 	}
 	
-	private void writeEntryToFile(BibEntry bibEntry, FileWriter fw) {		
+	private String parseEntry(BibEntry bibEntry) {		
 		String stringEntry = "@" + bibEntry.getType().toLowerCase(Locale.ENGLISH) + "{";
 		if(bibEntry.getCiteKeyOptional().isPresent()) {
 			 stringEntry += bibEntry.getCiteKeyOptional().get() + "\n";
@@ -59,13 +48,7 @@ public class BibtexExportFormat extends ExportFormat {
 				stringEntry += "\n";
 			}
 		}
-		stringEntry += "}\n";
-		try {
-			fw.write(stringEntry);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return stringEntry += "}\n";
 	}
 	
 	

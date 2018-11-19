@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.jabref.Globals;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.logic.exporter.BibTeXMLExportFormat;
@@ -39,6 +41,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import se.kau.cs.serg.cabref.beans.BibEntryBean;
+import spark.Response;
 import spark.Spark;
 import org.jsoup.*;
 import org.jsoup.nodes.*;
@@ -304,12 +307,14 @@ public class CabRefServer {
 		
 	}
 	
-	public synchronized void export(String path) 
+	public synchronized void export(String format, Response res) 
 	{
 		ParserResult parserResult = readEntriesFromFile();
 		BibDatabaseContext context = parserResult.getDatabaseContext();
 		
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
+		
+		String exportString;
 		
 		
 		/*ExportFormat format = new ExportFormat("BibTex", "bibtex", null, null, ".bib" );
@@ -326,27 +331,40 @@ public class CabRefServer {
 		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
 		BibtexExportFormat BibFormat = new BibtexExportFormat();
 		
-		if(path.isEmpty()) {
-			path = System.getProperty("user.dir");
+		if(format.isEmpty()) {
+			return;
 		}
 		
 		try {
-				System.out.println(path + "/export.xml");
-				XMLformat.performExport(
-						context, path + "/export.xml",
-						context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
-						context.getEntries()
-						);
-				BibFormat.performExport(
-						context, path + "/export.bib",
-						context.getMetaData().getEncoding().orElse(jrp.getDefaultEncoding()),
-						context.getEntries()
-						);
+				switch(format) {
+				case "XML":
+					exportString = XMLformat.exportAsString(context, context.getEntries());
+					writeHTTPResponse(res, exportString, "export.xml");
+					break;
+				case "Bibtex":
+					exportString = BibFormat.exportAsString(context, context.getEntries());
+					writeHTTPResponse(res, exportString, "export.bib");
+					break;
+				default: 
+					break;
+				}
 		} catch (SaveException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+	
+	private void writeHTTPResponse(Response res, String exportString, String filename) {
+		HttpServletResponse raw = res.raw();
+		res.header("Content-Disposition", "attachment; filename=" + filename); 
+		res.type("application/force-download");
+		try {
+			raw.getOutputStream().write(exportString.getBytes());
+			raw.getOutputStream().flush();
+			raw.getOutputStream().close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

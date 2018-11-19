@@ -7,6 +7,8 @@ import static spark.Spark.post;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -69,8 +71,8 @@ public class RouteSetup {
 	
 	private static Object export(Request req, Response res, CabRefServer server) 
 	{
-		server.export(req.queryParams("path"));
-		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
+		server.export(req.queryParams("exportFormat"), res);
+		//res.redirect("/cabref" + "?login=" + req.queryParams("login"));
 		return "";
 	}
 	

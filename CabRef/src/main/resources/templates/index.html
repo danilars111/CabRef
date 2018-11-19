@@ -32,7 +32,8 @@
 <form th:action="@{cabref/export}" method="post">
    <p>
    <input type="submit" value="Export"  class="btn btn-info"/>
-   Export directory: <input type="text" name="path" placeholder="(default: working directory)"/>
+   <input type="radio" name="exportFormat" value="XML" checked> XML
+   <input type="radio" name="exportFormat" value="Bibtex"> Bibtex
    </p>
    <input type="hidden" name="login" th:value="${login}"/>
 </form>
