@@ -34,6 +34,7 @@ public class DiVA implements IdBasedParserFetcher {
     private final ImportFormatPreferences importFormatPreferences;
 
 
+
     public DiVA(ImportFormatPreferences importFormatPreferences) {
 
         this.importFormatPreferences = importFormatPreferences;
@@ -183,21 +184,17 @@ public class DiVA implements IdBasedParserFetcher {
         return id;
     }
 
+
     private boolean isValidId(String id) {
 
-        if (id.startsWith("diva2:")) {
-            return true;
-        } else if (id.startsWith("10.")) {
-            return true;
-        } else if (id.startsWith("978-") || id.startsWith("979-")) {
-            return true;
-        } else if (id.startsWith("oai:")) {
-            return true;
-        } else if (id.startsWith("urn:")) {
-            return true;
-        } else {
-            return false;
+        String validIds[] = {"diva2:", "10.", "978-", "979-", "oai:", "urn:"};
+
+        for (int i = 0; i < validIds.length; i++) {
+            if (id.startsWith(validIds[i])) {
+                return true;
+            }
         }
+        return false;
     }
 
 }
