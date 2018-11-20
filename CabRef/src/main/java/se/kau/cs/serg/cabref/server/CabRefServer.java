@@ -279,11 +279,11 @@ public class CabRefServer {
 				switch(format) {
 				case "XML":
 					exportString = XMLformat.exportAsString(context, context.getEntries());
-					writeHTTPResponse(res, exportString, "export.xml");
+					writeHTTPDownloadResponse(res, exportString, "export.xml");
 					break;
 				case "Bibtex":
 					exportString = BibFormat.exportAsString(context, context.getEntries());
-					writeHTTPResponse(res, exportString, "export.bib");
+					writeHTTPDownloadResponse(res, exportString, "export.bib");
 					break;
 				default: 
 					break;
@@ -294,7 +294,7 @@ public class CabRefServer {
 		}
 	}
 	
-	private void writeHTTPResponse(Response res, String exportString, String filename) {
+	private void writeHTTPDownloadResponse(Response res, String exportString, String filename) {
 		HttpServletResponse raw = res.raw();
 		res.header("Content-Disposition", "attachment; filename=" + filename); 
 		res.type("application/force-download");
