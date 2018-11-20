@@ -75,7 +75,6 @@ public class DiVA implements IdBasedParserFetcher {
         if (isValidDiVaId(id)) {
             URL citationPageURL;
 
-
             try {
                 citationPageURL = getURLForID(id);
                 System.out.println(citationPageURL.toString());
@@ -86,11 +85,9 @@ public class DiVA implements IdBasedParserFetcher {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
         }
 
         return newEntry;
-
     }
 
     private BibEntry downloadEntry(String link) throws FetcherException, IOException {
@@ -113,7 +110,7 @@ public class DiVA implements IdBasedParserFetcher {
 
     public String retrieveDiVaId(String id) {
 
-        String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
+        String searchURL = "http://diva-portal.org/smash/resultList.jsf?query=" + id;
         System.out.println(searchURL);
 
         if (!isValidId(id)) {
