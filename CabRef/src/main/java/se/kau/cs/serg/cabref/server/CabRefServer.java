@@ -275,23 +275,19 @@ public class CabRefServer {
 			return;
 		}
 		
-		try {
-				switch(format) {
-				case "XML":
-					exportString = XMLformat.exportAsString(context, context.getEntries());
-					writeHTTPDownloadResponse(res, exportString, "export.xml");
-					break;
-				case "Bibtex":
-					exportString = BibFormat.exportAsString(context, context.getEntries());
-					writeHTTPDownloadResponse(res, exportString, "export.bib");
-					break;
-				default: 
-					break;
-				}
-		} catch (SaveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		switch(format) {
+		case "XML":
+			exportString = XMLformat.exportAsString(context, context.getEntries());
+			writeHTTPDownloadResponse(res, exportString, "export.xml");
+			break;
+		case "Bibtex":
+			exportString = BibFormat.exportAsString(context, context.getEntries());
+			writeHTTPDownloadResponse(res, exportString, "export.bib");
+			break;
+		default: 
+			break;
 		}
+
 	}
 	
 	private void writeHTTPDownloadResponse(Response res, String exportString, String filename) {
