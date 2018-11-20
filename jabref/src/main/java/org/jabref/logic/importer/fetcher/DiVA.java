@@ -9,8 +9,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.regex.Pattern;
-
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -34,7 +32,7 @@ import org.jsoup.select.Elements;
 public class DiVA implements IdBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
-    private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(http:\\/\\/www.diva-portal.org\\/smash\\/getreferences[?]referenceFormat[=]BibTex[&]pids=[^\"]*)");
+
 
     public DiVA(ImportFormatPreferences importFormatPreferences) {
 
