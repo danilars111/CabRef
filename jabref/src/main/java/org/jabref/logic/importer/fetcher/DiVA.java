@@ -114,7 +114,6 @@ public class DiVA implements IdBasedParserFetcher {
 
     public String retrieveDiVaId(String id) {
 
-        // TODO: refactor functionality to smaller functions
         String searchURL = "http://kau.diva-portal.org/smash/resultList.jsf?query=" + id;
         System.out.println(searchURL);
 
@@ -145,7 +144,7 @@ public class DiVA implements IdBasedParserFetcher {
             e.printStackTrace();
             return null;
         }
-        url = "http://kau.diva-portal.org" + doc.getElementsByClass("ui-datalist-item").first()
+        url = "http://diva-portal.org" + doc.getElementsByClass("ui-datalist-item").first()
                 .select("a").first().attr("href");
         try {
             doc = Jsoup.connect(url).get();
