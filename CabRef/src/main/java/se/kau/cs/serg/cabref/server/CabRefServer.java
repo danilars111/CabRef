@@ -248,19 +248,12 @@ public class CabRefServer {
 		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
 		
 		id = divaImporter.retrieveDiVaId(id);
-		
-		
-		
 		BibEntry newEntry = divaImporter.getEntry(id);
-		
 		
 		ParserResult parserResult = readEntriesFromFile();
 		parserResult.getDatabase().insertEntry(newEntry);
 		
 		writeDataToDisk(parserResult.getDatabaseContext());
-		
-		
-		
 	}
 	
 	public synchronized void export(String format, Response res) 
