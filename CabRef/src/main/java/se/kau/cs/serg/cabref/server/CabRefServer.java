@@ -270,24 +270,8 @@ public class CabRefServer {
 	public synchronized void export(String format, Response res) 
 	{
 		ParserResult parserResult = readEntriesFromFile();
-		BibDatabaseContext context = parserResult.getDatabaseContext();
-		
-		JabRefPreferences jrp = JabRefPreferences.getInstance();
-		
-		String exportString;
-		
-		
-		/*ExportFormat format = new ExportFormat("BibTex", "bibtex", null, null, ".bib" );
-		 
-		try {
-			format.performExport(context, "C:\\Users\\marti\\Desktop\\export.bib" ,
-									context.getMetaData().getEncoding().get(),
-									context.getEntries());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} */
-		
+		BibDatabaseContext context = parserResult.getDatabaseContext();		
+		String exportString;		
 		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
 		BibtexExportFormat BibFormat = new BibtexExportFormat();
 		
