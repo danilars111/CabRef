@@ -58,13 +58,10 @@ public class RouteSetup {
 	
 	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {
-		if(server.importFromDiVa(req.queryParams("id"))) {
-			//TODO: Print nice green OK text on page
-			res.redirect("/cabref" + "?login=" + req.queryParams("login"));
-		} else {
-			//TODO: Print angry red NOT FOUND text on page
-			res.redirect("/cabref" + "?login=" + req.queryParams("login"));
-		}
+		
+		server.importFromDiVa(req.queryParams("id"));
+		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
+		
 		
 		return "";
 	}

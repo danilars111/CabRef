@@ -242,28 +242,24 @@ public class CabRefServer {
 		}
 	}
 	
-	public synchronized boolean importFromDiVa(String id)
+	public synchronized void importFromDiVa(String id)
 	{	
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
 		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
 		
 		id = divaImporter.retrieveDiVaId(id);
 		
-		if(id == null) {
-			return false;
-		}
+		
 		
 		BibEntry newEntry = divaImporter.getEntry(id);
-		if(newEntry == null) {
-			return false;
-		}
+		
 		
 		ParserResult parserResult = readEntriesFromFile();
 		parserResult.getDatabase().insertEntry(newEntry);
 		
 		writeDataToDisk(parserResult.getDatabaseContext());
 		
-		return true;
+		
 		
 	}
 	
