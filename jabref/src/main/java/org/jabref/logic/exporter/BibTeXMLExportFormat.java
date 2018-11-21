@@ -1,5 +1,7 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -122,7 +124,81 @@ public class BibTeXMLExportFormat extends ExportFormat {
             }
             file.getEntry().add(entry);
         }
+
+        System.out.println("XML FILE----------------\n" + file.toString());
         createMarshallerAndWriteToFile(file, resultFile);
+    }
+
+    public String exportAsString(final BibDatabaseContext databaseContext, List<BibEntry> entries) {
+        String exportString = "";
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        if (entries.isEmpty()) { // Only export if entries exist
+            return exportString;
+        }
+
+        File file = new File();
+        for (BibEntry bibEntry : entries) {
+            Entry entry = new Entry();
+
+            bibEntry.getCiteKeyOptional().ifPresent(citeKey -> entry.setId(citeKey));
+            String type = bibEntry.getType().toLowerCase(ENGLISH);
+            switch (type) {
+                case "article":
+                    parse(new Article(), bibEntry, entry);
+                    break;
+                case "book":
+                    parse(new Book(), bibEntry, entry);
+                    break;
+                case "booklet":
+                    parse(new Booklet(), bibEntry, entry);
+                    break;
+                case "conference":
+                    parse(new Conference(), bibEntry, entry);
+                    break;
+                case "inbook":
+                    parseInbook(new Inbook(), bibEntry, entry);
+                    break;
+                case "incollection":
+                    parse(new Incollection(), bibEntry, entry);
+                    break;
+                case "inproceedings":
+                    parse(new Inproceedings(), bibEntry, entry);
+                    break;
+                case "mastersthesis":
+                    parse(new Mastersthesis(), bibEntry, entry);
+                    break;
+                case "manual":
+                    parse(new Manual(), bibEntry, entry);
+                    break;
+                case "misc":
+                    parse(new Misc(), bibEntry, entry);
+                    break;
+                case "phdthesis":
+                    parse(new Phdthesis(), bibEntry, entry);
+                    break;
+                case "proceedings":
+                    parse(new Proceedings(), bibEntry, entry);
+                    break;
+                case "techreport":
+                    parse(new Techreport(), bibEntry, entry);
+                    break;
+                case "unpublished":
+                    parse(new Unpublished(), bibEntry, entry);
+                    break;
+                default:
+                    LOGGER.warn("unexpected type appeared");
+                    break;
+            }
+            file.getEntry().add(entry);
+            try {
+                exportString += createMarshallerAndMakeString(file);
+            } catch (SaveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return exportString;
     }
 
     private void createMarshallerAndWriteToFile(File file, String resultFile) throws SaveException {
@@ -134,6 +210,36 @@ public class BibTeXMLExportFormat extends ExportFormat {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             marshaller.marshal(file, new java.io.File(resultFile));
+        } catch (JAXBException e) {
+            throw new SaveException(e);
+        }
+    }
+
+    private String createMarshallerAndMakeString(File file) throws SaveException {
+        try {
+            if (context == null) {
+                context = JAXBContext.newInstance(File.class);
+            }
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+            OutputStream os = new OutputStream()
+            {
+                private final StringBuilder string = new StringBuilder();
+                @Override
+                public void write(int b) throws IOException {
+                    this.string.append((char) b );
+                }
+
+                @Override
+                public String toString(){
+                    return this.string.toString();
+                }
+            };
+
+            marshaller.marshal(file, os);
+
+            return os.toString();
         } catch (JAXBException e) {
             throw new SaveException(e);
         }

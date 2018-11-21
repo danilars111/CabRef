@@ -1,28 +1,52 @@
 package se.kau.cs.serg.cabref.server;
 
+import java.beans.Encoder;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.jabref.Globals;
+import org.jabref.gui.exporter.BibtexExportFormat;
+import org.jabref.gui.exporter.ExportAction;
+import org.jabref.logic.exporter.BibTeXMLExportFormat;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import se.kau.cs.serg.cabref.beans.BibEntryBean;
+import spark.Response;
 import spark.Spark;
+import org.jsoup.*;
+import org.jsoup.nodes.*;
+import org.jsoup.select.Elements;
 
 /**
  * Central server class that builds on JabRef and processes requests
@@ -34,6 +58,7 @@ public class CabRefServer {
 	 * The final path that points to the reference file of this server
 	 */
 	private static final String filePath = "src/main/resources/bib/simple-file.bib";
+	
 
 	/**
 	 * The file of accepted users
@@ -213,6 +238,60 @@ public class CabRefServer {
 			SaveSession session = databaseWriter.saveDatabase(context, new SavePreferences());
 			session.commit(filePath);
 		} catch (SaveException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void importFromDiVa(String id)
+	{	
+		JabRefPreferences jrp = JabRefPreferences.getInstance();
+		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
+		
+		id = divaImporter.retrieveDiVaId(id);
+		BibEntry newEntry = divaImporter.getEntry(id);
+		
+		ParserResult parserResult = readEntriesFromFile();
+		parserResult.getDatabase().insertEntry(newEntry);
+		
+		writeDataToDisk(parserResult.getDatabaseContext());
+	}
+	
+	public synchronized void export(String format, Response res) 
+	{
+		ParserResult parserResult = readEntriesFromFile();
+		BibDatabaseContext context = parserResult.getDatabaseContext();		
+		String exportString;		
+		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
+		BibtexExportFormat BibFormat = new BibtexExportFormat();
+		
+		if(format.isEmpty()) {
+			return;
+		}
+		
+		switch(format) {
+		case "XML":
+			exportString = XMLformat.exportAsString(context, context.getEntries());
+			writeHTTPDownloadResponse(res, exportString, "export.xml");
+			break;
+		case "Bibtex":
+			exportString = BibFormat.exportAsString(context, context.getEntries());
+			writeHTTPDownloadResponse(res, exportString, "export.bib");
+			break;
+		default: 
+			break;
+		}
+
+	}
+	
+	private void writeHTTPDownloadResponse(Response res, String exportString, String filename) {
+		HttpServletResponse raw = res.raw();
+		res.header("Content-Disposition", "attachment; filename=" + filename); 
+		res.type("application/force-download");
+		try {
+			raw.getOutputStream().write(exportString.getBytes());
+			raw.getOutputStream().flush();
+			raw.getOutputStream().close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
