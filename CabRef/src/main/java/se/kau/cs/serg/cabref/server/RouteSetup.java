@@ -59,8 +59,15 @@ public class RouteSetup {
 	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {
 		
-		server.importFromDiVa(req.queryParams("id"));
-		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
+		String key = server.importFromDiVa(req.queryParams("id"));
+		
+		if(key == null) {
+			res.redirect("/cabref" + "?login=" + req.queryParams("login"));
+		}
+		
+		else {
+			res.redirect("/cabref/" + key + "?login=" + req.queryParams("login"));
+		}
 		
 		
 		return "";
