@@ -249,12 +249,11 @@ public class CabRefServer {
 		
 		id = divaImporter.retrieveDiVaId(id);
 		BibEntry newEntry = divaImporter.getEntry(id);
-		
-		
-		
+		if(newEntry == null) {
+			return null;
+		}
 		
 		ParserResult parserResult = readEntriesFromFile();
-		
 		List<BibEntry> entries = parserResult.getDatabase().getEntriesByKey(newEntry.getCiteKey()); 
 		
 		if(entries.isEmpty()) {
@@ -263,7 +262,7 @@ public class CabRefServer {
 			
 		
 			writeDataToDisk(parserResult.getDatabaseContext()); 
-			return null;
+			return newEntry.getCiteKey().toString();
 		}
 		else 
 		{

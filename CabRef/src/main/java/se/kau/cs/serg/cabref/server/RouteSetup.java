@@ -45,6 +45,12 @@ public class RouteSetup {
 		Map<String, Object> model = new HashMap<>();
 		model.put("login", req.queryParams("login"));
 		model.put("entries", server.getEntries());
+		if(req.queryMap("emptyid") != null) {
+			model.put("emptyid", req.queryParams("emptyid"));
+		}
+		if(req.queryMap("idnotfound") != null) {
+			model.put("idnotfound", req.queryParams("idnotfound"));
+		}
 		return new ModelAndView(model, "index");
 	}
 
@@ -55,20 +61,19 @@ public class RouteSetup {
 		return new ModelAndView(model, "entryPage");
 	}
 	
-	
-	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {
+		if(req.queryParams("id").length() == 0) {
+			res.redirect("/cabref" + "?login=" + req.queryParams("login") + "&emptyid=true");
+			return "";
+		}
 		
 		String key = server.importFromDiVa(req.queryParams("id"));
-		
+		System.out.println(key);
 		if(key == null) {
-			res.redirect("/cabref" + "?login=" + req.queryParams("login"));
-		}
-		
-		else {
+			res.redirect("/cabref" + "?login=" + req.queryParams("login") + "&idnotfound=true");
+		} else {
 			res.redirect("/cabref/" + key + "?login=" + req.queryParams("login"));
 		}
-		
 		
 		return "";
 	}
