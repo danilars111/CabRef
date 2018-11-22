@@ -29,6 +29,18 @@
    <input type="hidden" name="login" th:value="${login}"/>
 </form>
 
+<div th:if="${emptyid}">
+  	<div class="alert alert-danger" role="alert">
+  		ID is empty
+	</div>
+</div>
+
+<div th:if="${idnotfound}">
+  	<div class="alert alert-danger" role="alert">
+  		ID not found
+	</div>
+</div>
+
 <form th:action="@{cabref/export}" method="post">
    <p>
    <input type="submit" value="Export"  class="btn btn-info"/>
