@@ -7,8 +7,6 @@ import static spark.Spark.post;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -22,6 +20,7 @@ public class RouteSetup {
 	public static void setupRoutes(CabRefServer server) {
 		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
 
+		
 		get("/cabref", (req, res) -> index(req, res, server), engine);
 		get("/cabref/:key", (req, res) -> entryPage(req, res, server), engine);
 
@@ -39,6 +38,19 @@ public class RouteSetup {
 		// here is an example for substituting 'put' with 'post'
 		// the same applies for put
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
+		
+		get("/login", (req, res) -> login(req, res, server), engine);
+		get("*", (req, res) -> defaultCase(req, res, server));
+	}
+	
+	public static Object defaultCase(Request req, Response res, CabRefServer server) {
+		res.redirect("/login");
+		return "";
+	}
+	
+	public static ModelAndView login(Request req, Response res, CabRefServer server) {
+		Map<String, Object> model = new HashMap<>();
+		return new ModelAndView(model, "login");
 	}
 
 	public static ModelAndView index(Request req, Response res, CabRefServer server) {
