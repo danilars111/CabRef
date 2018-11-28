@@ -66,6 +66,9 @@ public class DiVA implements IdBasedParserFetcher {
     }
 
     public boolean isValidDiVaId(String identifier) {
+        if (identifier == null) {
+            return false;
+        }
         return identifier.startsWith("diva2:");
     }
 

@@ -242,18 +242,33 @@ public class CabRefServer {
 		}
 	}
 	
-	public synchronized void importFromDiVa(String id)
+	public synchronized String importFromDiVa(String id)
 	{	
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
 		DiVA divaImporter = new DiVA(jrp.getImportFormatPreferences());
 		
 		id = divaImporter.retrieveDiVaId(id);
 		BibEntry newEntry = divaImporter.getEntry(id);
+		if(newEntry == null) {
+			return null;
+		}
 		
 		ParserResult parserResult = readEntriesFromFile();
-		parserResult.getDatabase().insertEntry(newEntry);
+		List<BibEntry> entries = parserResult.getDatabase().getEntriesByKey(newEntry.getCiteKey()); 
 		
-		writeDataToDisk(parserResult.getDatabaseContext());
+		if(entries.isEmpty()) {
+		
+			parserResult.getDatabase().insertEntry(newEntry);
+			
+		
+			writeDataToDisk(parserResult.getDatabaseContext()); 
+			return newEntry.getCiteKey().toString();
+		}
+		else 
+		{
+			return newEntry.getCiteKey().toString();
+		}
+		
 	}
 	
 	public synchronized void export(String format, Response res) 

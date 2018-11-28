@@ -7,8 +7,6 @@ import static spark.Spark.post;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -22,6 +20,7 @@ public class RouteSetup {
 	public static void setupRoutes(CabRefServer server) {
 		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
 
+		
 		get("/cabref", (req, res) -> index(req, res, server), engine);
 		get("/cabref/:key", (req, res) -> entryPage(req, res, server), engine);
 
@@ -39,12 +38,31 @@ public class RouteSetup {
 		// here is an example for substituting 'put' with 'post'
 		// the same applies for put
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
+		
+		get("/login", (req, res) -> login(req, res, server), engine);
+		get("*", (req, res) -> defaultCase(req, res, server));
+	}
+	
+	public static Object defaultCase(Request req, Response res, CabRefServer server) {
+		res.redirect("/login");
+		return "";
+	}
+	
+	public static ModelAndView login(Request req, Response res, CabRefServer server) {
+		Map<String, Object> model = new HashMap<>();
+		return new ModelAndView(model, "login");
 	}
 
 	public static ModelAndView index(Request req, Response res, CabRefServer server) {
 		Map<String, Object> model = new HashMap<>();
 		model.put("login", req.queryParams("login"));
 		model.put("entries", server.getEntries());
+		if(req.queryMap("emptyid") != null) {
+			model.put("emptyid", req.queryParams("emptyid"));
+		}
+		if(req.queryMap("idnotfound") != null) {
+			model.put("idnotfound", req.queryParams("idnotfound"));
+		}
 		return new ModelAndView(model, "index");
 	}
 
@@ -55,13 +73,19 @@ public class RouteSetup {
 		return new ModelAndView(model, "entryPage");
 	}
 	
-	
-	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {
+		if(req.queryParams("id").length() == 0) {
+			res.redirect("/cabref" + "?login=" + req.queryParams("login") + "&emptyid=true");
+			return "";
+		}
 		
-		server.importFromDiVa(req.queryParams("id"));
-		res.redirect("/cabref" + "?login=" + req.queryParams("login"));
-		
+		String key = server.importFromDiVa(req.queryParams("id"));
+		System.out.println(key);
+		if(key == null) {
+			res.redirect("/cabref" + "?login=" + req.queryParams("login") + "&idnotfound=true");
+		} else {
+			res.redirect("/cabref/" + key + "?login=" + req.queryParams("login"));
+		}
 		
 		return "";
 	}
