@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
+
 import org.jabref.Globals;
 import org.jabref.gui.exporter.BibtexExportFormat;
 import org.jabref.gui.exporter.ExportAction;
@@ -309,6 +310,12 @@ public class CabRefServer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean authenticateUser(String username, String password) 
+	{
+		String s = username + ":" + password;
+		return authenticate(s);
 	}
 
 }

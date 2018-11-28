@@ -10,6 +10,7 @@ import java.util.Map;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
+import spark.Session;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 /**
@@ -77,8 +78,11 @@ public class RouteSetup {
 	
 	private static Object authenticate(Request req, Response res, CabRefServer server) 
 	{
+		//if(server.authenticateUser(req.queryParams("username"), req.queryParams("password"))) {
+			res.redirect("/cabref" + "?login=" + req.queryParams("username"));
+		//}
 		
-		res.redirect("/cabref" + "?login=" + req.queryParams("username"));
+		
 		return "";
 	}
 	
