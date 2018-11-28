@@ -11,7 +11,7 @@ public class FilterSetup {
 		// filter for authenticating any request
 		before((request, response) -> {
 			boolean userAuthenticated = server.authenticate(request.queryParams("login"));
-			if(request.url().contains("/cabref") && !userAuthenticated) {
+			if(request.url().contains("/cabref") && !request.url().contains("/authenticate") && !userAuthenticated) {
 				halt(401, "Access denied");
 			}
 		});

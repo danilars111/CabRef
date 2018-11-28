@@ -27,6 +27,7 @@ public class RouteSetup {
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
 		post("/cabref/importFromDiVa", (req, res) -> importFromDiVa(req, res, server));
 		post("/cabref/export", (req, res) -> export(req, res, server));
+		post("/cabref/authenticate", (req, res) -> authenticate(req, res, server));
 
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		// unfortunately, delete and put cannot be called from thymeleaf, so we
@@ -71,6 +72,14 @@ public class RouteSetup {
 		model.put("login", req.queryParams("login"));
 		model.put("entry", server.getEntry(req.params(":key")));
 		return new ModelAndView(model, "entryPage");
+	}
+	
+	
+	private static Object authenticate(Request req, Response res, CabRefServer server) 
+	{
+		
+		res.redirect("/cabref" + "?login=" + req.queryParams("username"));
+		return "";
 	}
 	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {
