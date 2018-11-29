@@ -1,10 +1,15 @@
 package se.kau.cs.serg.cabref;
 
+import static spark.Spark.stop;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.pac4j.core.config.Config;
+import org.pac4j.mongo.profile.service.MongoProfileService;
+
+import com.mongodb.MongoClient;
 
 import se.kau.cs.serg.cabref.server.CabRefConfigFactory;
 import se.kau.cs.serg.cabref.server.CabRefHttpActionAdapter;
@@ -13,13 +18,13 @@ import se.kau.cs.serg.cabref.server.FilterSetup;
 import se.kau.cs.serg.cabref.server.RouteSetup;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
-import static spark.Spark.*;
-
 public class CabRefServerStartup {
 
 	public static void main(String[] args) {
 		CabRefServer server = new CabRefServer();
 		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
+		MongoClient mongoClient = new MongoClient();
+		MongoProfileService mongoProfileService = new MongoProfileService(mongoClient);
 		final Config config = new CabRefConfigFactory().build();
 		config.setHttpActionAdapter(new CabRefHttpActionAdapter(engine));
 		
