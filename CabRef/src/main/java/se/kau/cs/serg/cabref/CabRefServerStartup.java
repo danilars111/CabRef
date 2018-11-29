@@ -23,11 +23,8 @@ public class CabRefServerStartup {
 	public static void main(String[] args) {
 		CabRefServer server = new CabRefServer();
 		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
-		MongoClient mongoClient = new MongoClient();
-		MongoProfileService mongoProfileService = new MongoProfileService(mongoClient);
 		final Config config = new CabRefConfigFactory().build();
 		config.setHttpActionAdapter(new CabRefHttpActionAdapter(engine));
-		
 		configureRoutes(server, engine, config);
 		configureFilters(server, engine, config);
 		printMessage();
