@@ -14,15 +14,7 @@ public class FilterSetup {
 
 	public static void setupFilters(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
 		// filter for authenticating any request
-		before("/index", new SecurityFilter(config, "FormClient"));
-		/*before((request, response) -> {
-			boolean userAuthenticated = server.authenticate(request.queryParams("login"));
-			if(request.url().contains("/cabref") && !request.url().contains("/authenticate") && !userAuthenticated) {
-				halt(401, "Access denied");
-			}
-		});*/
-	}
-	
-	
+		before("/cabref", new SecurityFilter(config, "FormClient"));
+	}	
 
 }

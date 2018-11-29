@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.sparkjava.CallbackRoute;
 
 import spark.ModelAndView;
 import spark.Request;
@@ -22,6 +23,9 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 public class RouteSetup {
 
 	public static void setupRoutes(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
+		final CallbackRoute callback = new CallbackRoute(config, "/cabref");
+		get("/callback", callback);
+		post("/callback", callback);
 		
 		get("/cabref", (req, res) -> index(req, res, server), engine);
 		get("/cabref/:key", (req, res) -> entryPage(req, res, server), engine);
@@ -29,7 +33,6 @@ public class RouteSetup {
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
 		post("/cabref/importFromDiVa", (req, res) -> importFromDiVa(req, res, server));
 		post("/cabref/export", (req, res) -> export(req, res, server));
-		post("/cabref/authenticate", (req, res) -> authenticate(req, res, server));
 
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		// unfortunately, delete and put cannot be called from thymeleaf, so we
@@ -43,16 +46,11 @@ public class RouteSetup {
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
 		
 		get("/login", (req, res) -> login(req, res, server, config), engine);
-		//get("*", (req, res) -> defaultCase(req, res, server));
 	}
-	
-	/*public static Object defaultCase(Request req, Response res, CabRefServer server) {
-		res.redirect("/login");
-		return "";
-	}*/
 	
 	public static ModelAndView login(Request req, Response res, CabRefServer server, Config config) {
 		Map<String, Object> model = new HashMap<>();
+		model.put("callbackUrl", config.getClients().findClient(FormClient.class).getCallbackUrl());
 		return new ModelAndView(model, "login");
 	}
 	
@@ -74,17 +72,6 @@ public class RouteSetup {
 		model.put("login", req.queryParams("login"));
 		model.put("entry", server.getEntry(req.params(":key")));
 		return new ModelAndView(model, "entryPage");
-	}
-	
-	
-	private static Object authenticate(Request req, Response res, CabRefServer server) 
-	{
-		//if(server.authenticateUser(req.queryParams("username"), req.queryParams("password"))) {
-			res.redirect("/cabref" + "?login=" + req.queryParams("username"));
-		//}
-		
-		
-		return "";
 	}
 	
 	private static Object importFromDiVa(Request req, Response res, CabRefServer server) {

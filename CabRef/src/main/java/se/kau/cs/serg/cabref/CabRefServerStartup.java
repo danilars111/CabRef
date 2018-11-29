@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import org.pac4j.core.config.Config;
 
 import se.kau.cs.serg.cabref.server.CabRefConfigFactory;
+import se.kau.cs.serg.cabref.server.CabRefHttpActionAdapter;
 import se.kau.cs.serg.cabref.server.CabRefServer;
 import se.kau.cs.serg.cabref.server.FilterSetup;
 import se.kau.cs.serg.cabref.server.RouteSetup;
@@ -20,6 +21,7 @@ public class CabRefServerStartup {
 		CabRefServer server = new CabRefServer();
 		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
 		final Config config = new CabRefConfigFactory().build();
+		config.setHttpActionAdapter(new CabRefHttpActionAdapter(engine));
 		
 		configureRoutes(server, engine, config);
 		configureFilters(server, engine, config);

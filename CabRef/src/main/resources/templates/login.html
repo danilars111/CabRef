@@ -16,7 +16,7 @@
         </div>
         <div class="col-xs-2 center-block text-center">
             <span>
-                <form th:action="@{cabref/authenticate}" method="post">
+                <form th:action="@{${callbackUrl} + '?client_name=FormClient'}" method="post">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" class="form-control" name="username">
