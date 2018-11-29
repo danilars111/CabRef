@@ -7,6 +7,9 @@ import static spark.Spark.post;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.pac4j.core.config.Config;
+import org.pac4j.http.client.indirect.FormClient;
+
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -18,9 +21,7 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
  */
 public class RouteSetup {
 
-	public static void setupRoutes(CabRefServer server) {
-		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
-
+	public static void setupRoutes(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
 		
 		get("/cabref", (req, res) -> index(req, res, server), engine);
 		get("/cabref/:key", (req, res) -> entryPage(req, res, server), engine);
@@ -41,20 +42,20 @@ public class RouteSetup {
 		// the same applies for put
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
 		
-		get("/login", (req, res) -> login(req, res, server), engine);
-		get("*", (req, res) -> defaultCase(req, res, server));
+		get("/login", (req, res) -> login(req, res, server, config), engine);
+		//get("*", (req, res) -> defaultCase(req, res, server));
 	}
 	
-	public static Object defaultCase(Request req, Response res, CabRefServer server) {
+	/*public static Object defaultCase(Request req, Response res, CabRefServer server) {
 		res.redirect("/login");
 		return "";
-	}
+	}*/
 	
-	public static ModelAndView login(Request req, Response res, CabRefServer server) {
+	public static ModelAndView login(Request req, Response res, CabRefServer server, Config config) {
 		Map<String, Object> model = new HashMap<>();
 		return new ModelAndView(model, "login");
 	}
-
+	
 	public static ModelAndView index(Request req, Response res, CabRefServer server) {
 		Map<String, Object> model = new HashMap<>();
 		model.put("login", req.queryParams("login"));

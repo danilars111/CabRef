@@ -76,17 +76,18 @@
 			<version>1.7.21</version>
 		</dependency>
 		
+		<!-- dependency for web security over Java -->
+		<dependency>
+    		<groupId>org.pac4j</groupId>
+    		<artifactId>spark-pac4j</artifactId>
+    		<version>3.0.0</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.pac4j</groupId>
+    		<artifactId>pac4j-http</artifactId>
+    		<version>3.4.0</version>
+		</dependency>
 		
-		<dependency>
-    		<groupId>org.apache.shiro</groupId>
-    		<artifactId>shiro-core</artifactId>
-    		<version>1.1.0</version>
-		</dependency>
-		<dependency>
-    		<groupId>org.apache.shiro</groupId>
-    		<artifactId>shiro-web</artifactId>
-    		<version>1.1.0</version>
-		</dependency>
 
 
 	</dependencies>
