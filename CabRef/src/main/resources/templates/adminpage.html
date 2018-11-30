@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CabRef</title>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+   <div class="container">
+         <h1 th:inline="text">Welcome to the admin page!</h1>
+         <table class="table">
+               <thead>
+                 <tr>
+                   <th scope="col">ID</th>
+                   <th scope="col">Username</th>
+                   <th scope="col"></th>
+                   <th scope="col"></th>
+                 </tr>
+               </thead>
+               <tbody>
+                  <th:block th:each="profile : ${profiles}">
+                     <tr>
+                        <th th:text="${profile.id}">...</th>
+                        <td th:text="${profile.username}">...</td>
+                        <td><a type="button" th:href="@{'adminpage/update/' + ${profile.id}}" class="btn btn-primary">Update</button></td>
+                        <td><a type="button" th:href="@{'adminpage/delete/' + ${profile.id}}" class="btn btn-danger">Remove</button></td>
+                     </tr>
+                  </th:block>
+                  <tr>
+                     <th><a type="button" th:href="@{'adminpage/update/'}" class="btn btn-primary">Add new user</button></th>
+                  </tr>
+               </tbody>
+         </table>
+   </div>
+</body>
+</html>

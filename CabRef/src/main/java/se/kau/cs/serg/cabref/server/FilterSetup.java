@@ -15,6 +15,7 @@ public class FilterSetup {
 	public static void setupFilters(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
 		// filter for authenticating any request
 		before("/cabref", new SecurityFilter(config, "FormClient"));
+		before("/adminpage/*", new SecurityFilter(config, "FormClient"));
 	}	
 
 }

@@ -18,6 +18,7 @@ public class CabRefConfigFactory implements ConfigFactory {
 		mongoProfileService.setUsersDatabase("CabRefDB");
 		mongoProfileService.setUsersCollection("Users");
 		mongoProfileService.setPasswordEncoder(new CabRefPasswordEncoder("$2a$10$GMiBKrVECNh9e05OrFlqwe"));
+		
 		final FormClient formClient = new FormClient("http://127.0.0.1:4567/login", mongoProfileService);
 		Clients Clients = new Clients("http://127.0.0.1:4567/callback", formClient);
 		final Config config = new Config(Clients);
