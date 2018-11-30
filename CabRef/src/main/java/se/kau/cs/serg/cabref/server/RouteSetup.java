@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.pac4j.core.config.Config;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.sparkjava.CallbackRoute;
+import org.pac4j.sparkjava.SparkWebContext;
 
 import spark.ModelAndView;
 import spark.Request;
@@ -27,7 +30,7 @@ public class RouteSetup {
 		get("/callback", callback);
 		post("/callback", callback);
 		
-		get("/cabref", (req, res) -> index(req, res, server), engine);
+		get("/cabref", (req, res) -> index(req, res, server, config), engine);
 		get("/cabref/:key", (req, res) -> entryPage(req, res, server), engine);
 
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
@@ -54,10 +57,17 @@ public class RouteSetup {
 		return new ModelAndView(model, "login");
 	}
 	
-	public static ModelAndView index(Request req, Response res, CabRefServer server) {
+	public static ModelAndView index(Request req, Response res, CabRefServer server, Config config) {
 		Map<String, Object> model = new HashMap<>();
-		model.put("login", req.queryParams("login"));
+		
+		if(getProfile(req, res).getUsername().equals("admin")) {
+			model.put("profiles", getProfile(req, res));
+			return new ModelAndView(model, "adminpage");
+		}
+		
+		model.put("profile", getProfile(req, res));
 		model.put("entries", server.getEntries());
+		
 		if(req.queryMap("emptyid") != null) {
 			model.put("emptyid", req.queryParams("emptyid"));
 		}
@@ -115,6 +125,12 @@ public class RouteSetup {
 				req.queryParams("number"), req.queryParams("year"));
 		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
 		return "";
+	}
+	
+	private static CommonProfile getProfile(Request req, Response res) {
+		final SparkWebContext context = new SparkWebContext(req, res);
+		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		return manager.get(true).get();
 	}
 
 }

@@ -1,7 +1,6 @@
 package se.kau.cs.serg.cabref.server;
 
 import org.pac4j.http.client.indirect.FormClient;
-import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.mongo.profile.service.MongoProfileService;
 
 import com.mongodb.MongoClient;
