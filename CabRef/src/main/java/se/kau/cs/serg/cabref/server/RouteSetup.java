@@ -48,6 +48,7 @@ public class RouteSetup {
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
 		
 		get("/login", (req, res) -> login(req, res, server, config), engine);
+		post("/login", (req, res) -> attemptedLogin(req, res));
 		get("/adminpage/update/", (req, res) -> editUser(req, res, server, config), engine);
 		get("/adminpage/update/:key", (req, res) -> editUser(req, res, server, config), engine);
 		post("/adminpage/update/username/:key", (req, res) -> editUsername(req, res, server, config));
@@ -143,7 +144,18 @@ public class RouteSetup {
 	public static ModelAndView login(Request req, Response res, CabRefServer server, Config config) {
 		Map<String, Object> model = new HashMap<>();
 		model.put("callbackUrl", config.getClients().findClient(FormClient.class).getCallbackUrl());
+		if(req.queryMap("emptyField").hasValue()) { model.put("emptyField", req.queryParams("emptyField")); }
+		else if(req.queryMap("error").hasValue()) { model.put("error", true); }
+		else { model.put("error", false); }
 		return new ModelAndView(model, "login");
+	}
+	
+	public static Object attemptedLogin(Request req, Response res) {
+		if(req.queryParams("username").isEmpty() || req.queryParams("password").isEmpty()) {
+			res.redirect("/login" + "?emptyField=true");
+		}
+		else { res.redirect("/callback" + "?client_name=FormClient"); }
+		return "";
 	}
 	
 	public static ModelAndView index(Request req, Response res, CabRefServer server, Config config) {
