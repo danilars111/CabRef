@@ -48,7 +48,7 @@ public class RouteSetup {
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
 		
 		get("/login", (req, res) -> login(req, res, server, config), engine);
-		post("/login", (req, res) -> attemptedLogin(req, res, config));
+		get("/logout", (req, res) -> logout(req, res));
 		get("/adminpage/update/", (req, res) -> editUser(req, res, server, config), engine);
 		get("/adminpage/update/:key", (req, res) -> editUser(req, res, server, config), engine);
 		post("/adminpage/update/username/:key", (req, res) -> editUsername(req, res, server, config));
@@ -148,6 +148,20 @@ public class RouteSetup {
 		else if(req.queryMap("error").hasValue()) { model.put("error", true); }
 		else { model.put("error", false); }
 		return new ModelAndView(model, "login");
+	}
+	
+	public static Object logout(Request req, Response res) {
+
+		final SparkWebContext context = new SparkWebContext(req, res);
+	    final ProfileManager manager = new ProfileManager(context);
+	    manager.logout();
+
+	    final Session session = req.session();
+	    if (session != null) {
+	        session.invalidate();
+	    }
+	    res.redirect("/cabref");
+		return "";
 	}
 	
 	

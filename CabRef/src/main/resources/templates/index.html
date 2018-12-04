@@ -13,6 +13,13 @@
 <div class="container">
 <h1 th:inline="text">Hello [[${profile.username}]]! Welcome to CabRef!</h1>
 
+<form th:action="@{logout}" method="get">
+   <input type="submit" value="Logout"  class="btn btn-info"/>
+   </p>
+   <input type="hidden" name="login" th:value="${login}"/>
+</form>
+
+
 <form th:action="@{cabref/addNew}" method="post">
    <p>
    <input type="submit" value="Add New"  class="btn btn-info"/>
