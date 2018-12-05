@@ -11,7 +11,7 @@
 </style>
 <body>
 <div class="container">
-<h1 th:inline="text">Hello [[${profile.username}]]! Welcome to CabRef!</h1>
+<h1 th:inline="text">Hello [[${profile.username}]] [[${role}]]! Welcome to CabRef!</h1>
 
 <form th:action="@{logout}" method="get">
    <input type="submit" value="Logout"  class="btn btn-info"/>

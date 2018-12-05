@@ -19,9 +19,9 @@ public class CabRefHttpActionAdapter extends DefaultHttpActionAdapter {
     @Override
     public Object adapt(int code, SparkWebContext context) {
         if (code == HttpConstants.UNAUTHORIZED) {
-            stop(401, templateEngine.render(new ModelAndView(new HashMap<>(), "error.html")));
+            stop(401, templateEngine.render(new ModelAndView(new HashMap<>(), "error")));
         } else if (code == HttpConstants.FORBIDDEN) {
-            stop(403, templateEngine.render(new ModelAndView(new HashMap<>(), "error.html")));
+            stop(403, templateEngine.render(new ModelAndView(new HashMap<>(), "error")));
         } else {
             return super.adapt(code, context);
         }

@@ -155,10 +155,10 @@ public class RouteSetup {
 		profile = new MongoProfile();
 		profile.setId(String.valueOf(index));
 		profile.addAttribute("username", req.queryParams("username"));
-		profile.addRole(req.queryParams("role"));
+		profile.addAttribute("role", req.queryParams("role"));
 		profile.setLinkedId(String.valueOf(index));
 		mongoProfileService.create(profile, req.queryParams("password"));
-		
+		System.out.println(profile.getAttributes());
 		
 		res.redirect("/cabref");
 		return "";
@@ -210,6 +210,7 @@ public class RouteSetup {
 		} else {
 			model.put("profile", getProfile(req, res));
 			model.put("entries", server.getEntries());
+			model.put("role", getProfile(req, res).getAttribute("role"));
 			
 			if(req.queryMap("emptyid") != null) {
 				model.put("emptyid", req.queryParams("emptyid"));
@@ -274,6 +275,7 @@ public class RouteSetup {
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
 		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		System.out.println(manager.get(true).get().getAttributes());
 		return manager.get(true).get();
 	}
 
