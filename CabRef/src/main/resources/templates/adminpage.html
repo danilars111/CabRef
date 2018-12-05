@@ -9,6 +9,11 @@
 <body>
    <div class="container">
          <h1 th:inline="text">Welcome to the admin page!</h1>
+         <form th:action="@{logout}" method="get">
+            <input type="submit" value="Logout"  class="btn btn-info"/>
+            </p>
+            <input type="hidden" name="login" th:value="${login}"/>
+         </form>
          <table class="table">
                <thead>
                  <tr>

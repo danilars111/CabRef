@@ -53,6 +53,7 @@ public class RouteSetup {
 		get("/adminpage/update/:key", (req, res) -> editUser(req, res, server, config), engine);
 		post("/adminpage/update/username/:key", (req, res) -> editUsername(req, res, server, config));
 		post("/adminpage/update/password/:key", (req, res) -> editPassword(req, res, server, config));
+		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
 	}
@@ -68,7 +69,7 @@ public class RouteSetup {
 			profile = mongoProfileService.findById(req.params(":key"));
 			profile.removeAttribute("username");
 			profile.addAttribute("username", req.queryParams("username"));
-			System.out.println("PARAMS: " +req.queryParams());
+			System.out.println("PARAMS: " + req.queryParams());
 			mongoProfileService.update(profile, "");
 		}
 		res.redirect("/adminpage/update/" + req.params(":key"));
@@ -87,6 +88,25 @@ public class RouteSetup {
 			mongoProfileService.remove(profile);
 			mongoProfileService.create(profile, req.queryParams("password"));
 			//mongoProfileService.update(profile, "");
+		}
+		res.redirect("/adminpage/update/" + req.params(":key"));
+		return "";
+	}
+	
+	private static Object editRole(Request req, Response res, CabRefServer server, Config config) {
+		MongoClient mongoClient = new MongoClient();
+		MongoProfileService mongoProfileService = new MongoProfileService(mongoClient);
+		MongoProfile profile;
+		mongoProfileService.setUsersDatabase("CabRefDB");
+		mongoProfileService.setUsersCollection("Users");
+		mongoProfileService.setPasswordEncoder(new CabRefPasswordEncoder("$2a$10$GMiBKrVECNh9e05OrFlqwe"));
+		if(req.params(":key") != null) {
+			profile = mongoProfileService.findById(req.params(":key"));
+			profile.removeAttribute("role");
+			profile.addAttribute("role", req.queryParams("role"));
+			System.out.println("PARAMS: " + req.queryParams());
+			System.out.println(profile.getAttribute("role"));
+			mongoProfileService.update(profile, "");
 		}
 		res.redirect("/adminpage/update/" + req.params(":key"));
 		return "";
@@ -135,7 +155,10 @@ public class RouteSetup {
 		profile = new MongoProfile();
 		profile.setId(String.valueOf(index));
 		profile.addAttribute("username", req.queryParams("username"));
+		profile.addRole(req.queryParams("role"));
+		profile.setLinkedId(String.valueOf(index));
 		mongoProfileService.create(profile, req.queryParams("password"));
+		
 		
 		res.redirect("/cabref");
 		return "";
