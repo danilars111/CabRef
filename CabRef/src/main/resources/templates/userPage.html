@@ -35,16 +35,13 @@
                   <div class="form-group">
                      <label for="role">Role</label>
                      <select class="form-control" name="role" id="role">
-                        <th:block th:if="${user.role}">
-                              <option>admin</option>
-                              <option selected="selected">standard</option>
-                        </th:block>
-                        <th:block th:unless="${user.role == standard}">
-                              <option selected="selected">admin</option>
-                              <option>standard</option>
-                        </th:block>
-                     </select>
-                   </div>
+                      
+                          <option>admin</option>
+                          <option selected="selected">standard</option>
+ 
+                       
+                    </select>
+               </div>
                    <button type="submit" class="btn btn-primary">Change role</button>
                </form>
             </div>

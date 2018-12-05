@@ -5,6 +5,7 @@ import org.pac4j.mongo.profile.service.MongoProfileService;
 
 import com.mongodb.MongoClient;
 
+import org.pac4j.core.authorization.authorizer.RequireAllRolesAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.ConfigFactory;
@@ -18,6 +19,9 @@ public class CabRefConfigFactory implements ConfigFactory {
 		mongoProfileService.setUsersDatabase("CabRefDB");
 		mongoProfileService.setUsersCollection("Users");
 		mongoProfileService.setPasswordEncoder(new CabRefPasswordEncoder("$2a$10$GMiBKrVECNh9e05OrFlqwe"));
+		
+		RequireAllRolesAuthorizer authorizer = new RequireAllRolesAuthorizer();
+		authorizer.setElements("admin");
 		
 		final FormClient formClient = new FormClient("http://127.0.0.1:4567/login", mongoProfileService);
 		Clients Clients = new Clients("http://127.0.0.1:4567/callback", formClient);
