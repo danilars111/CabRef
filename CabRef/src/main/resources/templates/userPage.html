@@ -30,6 +30,24 @@
                      <button type="submit" class="btn btn-primary">Change password</button>
                </form>
             </div>
+            <div class="row">
+               <form th:action="@{'role/' + ${user.id}}" method="post">
+                  <div class="form-group">
+                     <label for="role">Role</label>
+                     <select class="form-control" name="role" id="role">
+                        <th:block th:if="${user.role}">
+                              <option>admin</option>
+                              <option selected="selected">standard</option>
+                        </th:block>
+                        <th:block th:unless="${user.role == standard}">
+                              <option selected="selected">admin</option>
+                              <option>standard</option>
+                        </th:block>
+                     </select>
+                   </div>
+                   <button type="submit" class="btn btn-primary">Change role</button>
+               </form>
+            </div>
          </div>
          </th:block>
          <th:block th:if="${user == null}">
@@ -48,7 +66,16 @@
                            <input type="password" data-minlength="6" class="form-control" name="password" id="password" placeholder="Password" required>
                            <div class="help-block">Minimum of 6 characters</div>
                         </div>
-                     <button type="submit" class="btn btn-primary">Change password</button>
+                     </div>
+                     <div class="row">
+                        <div class="form-group">
+                           <label for="role">Role</label>
+                           <select class="form-control" name="role" id="role" value="standard">
+                              <option>admin</option>
+                              <option selected="selected">standard</option>
+                           </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create user</button>
                      </div>
                   </form>
                </div>
