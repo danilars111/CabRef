@@ -35,11 +35,21 @@
                   <div class="form-group">
                      <label for="role">Role</label>
                      <select class="form-control" name="role" id="role">
-                      
+                        <th:block th:if="${role == 'admin'}">
+                          <option selected>admin</option>
+                          <option>guest</option>
+                          <option>standard</option>  
+                        </th:block>   
+                        <th:block th:if="${role == 'guest'}">
                           <option>admin</option>
-                          <option selected="selected">standard</option>
- 
-                       
+                          <option selected>guest</option>
+                          <option>standard</option>  
+                        </th:block>  
+                        <th:block th:if="${role == 'standard'}">
+                          <option>admin</option>
+                          <option>guest</option>
+                          <option selected>standard</option>  
+                        </th:block>                    
                     </select>
                </div>
                    <button type="submit" class="btn btn-primary">Change role</button>
@@ -69,7 +79,8 @@
                            <label for="role">Role</label>
                            <select class="form-control" name="role" id="role" value="standard">
                               <option>admin</option>
-                              <option selected="selected">standard</option>
+                              <option selected="selected">guest</option>
+                              <option>standard</option>
                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Create user</button>

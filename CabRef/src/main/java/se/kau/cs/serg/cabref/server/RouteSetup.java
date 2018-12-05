@@ -58,8 +58,16 @@ public class RouteSetup {
 		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
+		
+		get("/api/entry/:key", (req, res) -> getEntry(req, res, server, config));
 	}
 	
+	private static Object getEntry(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		res.body("Works!");
+		return null;
+	}
+
 	private static Object editUsername(Request req, Response res, CabRefServer server, Config config) {
 		MongoClient mongoClient = new MongoClient();
 		MongoProfileService mongoProfileService = new MongoProfileService(mongoClient);
@@ -104,13 +112,10 @@ public class RouteSetup {
 		mongoProfileService.setPasswordEncoder(new CabRefPasswordEncoder("$2a$10$GMiBKrVECNh9e05OrFlqwe"));
 		if(req.params(":key") != null) {
 			profile = mongoProfileService.findById(req.params(":key"));
-			profile.removeAttribute("LOCATION");
-			profile.addAttribute("LOCATION", req.queryParams("role"));
+			profile.removeAttribute("role");
+			profile.addAttribute("role", req.queryParams("role"));
 			System.out.println("PARAMS: " + req.queryParams());
-			System.out.println(profile.getAttribute("LOCATION"));
-//			Set<String> set = Collections.emptySet();
-//			set.add(profile.getAttribute("LOCATION").toString());
-//			profile.setRoles(set);
+			System.out.println("role: " + profile.getAttribute("role"));
 			mongoProfileService.update(profile, "");
 
 		}
@@ -128,6 +133,7 @@ public class RouteSetup {
 		if(req.params(":key") != null) {
 			model.put("user", mongoProfileService.findById(req.params(":key")));
 		}
+		model.put("role", mongoProfileService.findById(req.params(":key")).getAttribute("role"));
 		return new ModelAndView(model, "userPage");
 	}
 
@@ -196,8 +202,7 @@ public class RouteSetup {
 	
 	public static ModelAndView index(Request req, Response res, CabRefServer server, Config config) {
 		Map<String, Object> model = new HashMap<>();
-		
-		if(getProfile(req, res).getUsername().equals("admin")) {
+		if(getProfile(req, res).getRoles().contains("admin")) {
 			MongoClient mongoClient = new MongoClient();
 			MongoProfile profile;
 			MongoProfileService mongoProfileService = new MongoProfileService(mongoClient);
@@ -281,7 +286,7 @@ public class RouteSetup {
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
 		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
-		System.out.println(manager.get(true).get().getAttributes());
+		manager.get(true).get().addRole(manager.get(true).get().getAttribute("role").toString());
 		return manager.get(true).get();
 	}
 

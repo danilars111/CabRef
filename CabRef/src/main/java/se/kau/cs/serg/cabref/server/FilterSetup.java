@@ -15,9 +15,10 @@ public class FilterSetup {
 	public static void setupFilters(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
 		// filter for authenticating any request
 		before("/cabref", new SecurityFilter(config, "FormClient"));
-		before("/adminpage/*", new SecurityFilter(config, "FormClient"));
-		before("/cabref/addNew", new SecurityFilter(config, "FormClient", "authorizer"));
-		before("/cabref/importFromDiVa", new SecurityFilter(config, "FormClient", "authorizer"));
-	}	
+		before("/cabref/*", new SecurityFilter(config, "FormClient", "standardAuthorizer"));
+		before("/adminpage/*", new SecurityFilter(config, "FormClient", "adminAuthorizer"));
+		//API endpoint filters
+		before("/api/*", new SecurityFilter(config, "HeaderClient"));
 
+	}	
 }
