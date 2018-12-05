@@ -5,9 +5,11 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.CommonProfile;
@@ -102,11 +104,15 @@ public class RouteSetup {
 		mongoProfileService.setPasswordEncoder(new CabRefPasswordEncoder("$2a$10$GMiBKrVECNh9e05OrFlqwe"));
 		if(req.params(":key") != null) {
 			profile = mongoProfileService.findById(req.params(":key"));
-			profile.removeAttribute("role");
-			profile.addAttribute("role", req.queryParams("role"));
+			profile.removeAttribute("LOCATION");
+			profile.addAttribute("LOCATION", req.queryParams("role"));
 			System.out.println("PARAMS: " + req.queryParams());
-			System.out.println(profile.getAttribute("role"));
+			System.out.println(profile.getAttribute("LOCATION"));
+//			Set<String> set = Collections.emptySet();
+//			set.add(profile.getAttribute("LOCATION").toString());
+//			profile.setRoles(set);
 			mongoProfileService.update(profile, "");
+
 		}
 		res.redirect("/adminpage/update/" + req.params(":key"));
 		return "";

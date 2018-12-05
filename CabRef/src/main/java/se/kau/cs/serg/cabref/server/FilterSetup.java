@@ -16,6 +16,8 @@ public class FilterSetup {
 		// filter for authenticating any request
 		before("/cabref", new SecurityFilter(config, "FormClient"));
 		before("/adminpage/*", new SecurityFilter(config, "FormClient"));
+		before("/cabref/addNew", new SecurityFilter(config, "FormClient", "authorizer"));
+		before("/cabref/importFromDiVa", new SecurityFilter(config, "FormClient", "authorizer"));
 	}	
 
 }
