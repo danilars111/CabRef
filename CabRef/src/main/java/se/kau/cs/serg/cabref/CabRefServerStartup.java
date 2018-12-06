@@ -1,33 +1,42 @@
 package se.kau.cs.serg.cabref;
 
+import static spark.Spark.stop;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.pac4j.core.config.Config;
+import org.pac4j.mongo.profile.service.MongoProfileService;
+
+import com.mongodb.MongoClient;
+
+import se.kau.cs.serg.cabref.server.CabRefConfigFactory;
+import se.kau.cs.serg.cabref.server.CabRefHttpActionAdapter;
 import se.kau.cs.serg.cabref.server.CabRefServer;
 import se.kau.cs.serg.cabref.server.FilterSetup;
 import se.kau.cs.serg.cabref.server.RouteSetup;
-
-import static spark.Spark.*;
+import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 public class CabRefServerStartup {
 
 	public static void main(String[] args) {
 		CabRefServer server = new CabRefServer();
-		
-		configureRoutes(server);
-		configureFilters(server);
+		ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
+		final Config config = new CabRefConfigFactory().build();
+		config.setHttpActionAdapter(new CabRefHttpActionAdapter(engine));
+		configureRoutes(server, engine, config);
+		configureFilters(server, engine, config);
 		printMessage();
 		waitForShutdown();
 	}
 
-	private static void configureRoutes(CabRefServer server) {
-		RouteSetup.setupRoutes(server);
+	private static void configureRoutes(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
+		RouteSetup.setupRoutes(server, engine, config);
 	}
 	
-	private static void configureFilters(CabRefServer server) {
-		FilterSetup.setupFilters(server);
+	private static void configureFilters(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
+		FilterSetup.setupFilters(server, engine, config);
 	}
 
 	private static void printMessage() {

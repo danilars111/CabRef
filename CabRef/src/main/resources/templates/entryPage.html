@@ -23,8 +23,8 @@
    <input type="submit" value="Update" class="btn btn-info" />
 </div>
 </form>
-<p><a th:href="@{'doDelete/'+${entry.key}(login=${login})}" class="btn btn-info"><span>Delete</span></a></p>
-<p><a th:href="@{'http://localhost:4567/cabref'(login=${login})}" class="btn btn-info"><span>Back</span></a></p>
+<p><a th:href="@{'doDelete/'+${entry.key}}" class="btn btn-info"><span>Delete</span></a></p>
+<p><a href="http://localhost:4567/cabref" class="btn btn-info"><span>Back</span></a></p>
 </div>
 </body>
 </html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CabRef</title>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+   <body>
+      <div class="container">
+         <th:block th:unless="${user == null}">
+            <h1>Editing user: [[${user.username}]]</h1>
+            <div class="col-sm-3">
+               <div class="row">
+                  <form th:action="@{'username/' + ${user.id}}" method="post">
+                     <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" th:value=${user.username}>
+                     </div>
+                     <button type="submit" class="btn btn-primary">Change username</button>
+                  </form>
+               </div>
+            <div class="row">
+               <form th:action="@{'password/' + ${user.id}}" method="post">
+                     <div class="form-group">
+                        <label for="password" class="control-label">Change password</label>
+                        <input type="password" data-minlength="6" class="form-control" name="password" id="password" placeholder="Password" required>
+                        <div class="help-block">Minimum of 6 characters</div>
+                     </div>
+                     <button type="submit" class="btn btn-primary">Change password</button>
+               </form>
+            </div>
+            <div class="row">
+               <form th:action="@{'role/' + ${user.id}}" method="post">
+                  <div class="form-group">
+                     <label for="role">Role</label>
+                     <select class="form-control" name="role" id="role">
+                        <th:block th:if="${role == 'admin'}">
+                          <option selected>admin</option>
+                          <option>guest</option>
+                          <option>standard</option>  
+                        </th:block>   
+                        <th:block th:if="${role == 'guest'}">
+                          <option>admin</option>
+                          <option selected>guest</option>
+                          <option>standard</option>  
+                        </th:block>  
+                        <th:block th:if="${role == 'standard'}">
+                          <option>admin</option>
+                          <option>guest</option>
+                          <option selected>standard</option>  
+                        </th:block>                    
+                    </select>
+               </div>
+                   <button type="submit" class="btn btn-primary">Change role</button>
+               </form>
+            </div>
+         </div>
+         </th:block>
+         <th:block th:if="${user == null}">
+               <h1>Create new user</h1>
+               <div class="col-sm-3">
+                  <form th:action="@{'create'}" method="post">
+                     <div class="row">
+                           <div class="form-group">
+                              <label for="username">Username</label>
+                              <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                           </div>
+                     </div>
+                     <div class="row">
+                        <div class="form-group">
+                           <label for="password" class="control-label">Change password</label>
+                           <input type="password" data-minlength="6" class="form-control" name="password" id="password" placeholder="Password" required>
+                           <div class="help-block">Minimum of 6 characters</div>
+                        </div>
+                     </div>
+                     <div class="row">
+                        <div class="form-group">
+                           <label for="role">Role</label>
+                           <select class="form-control" name="role" id="role" value="standard">
+                              <option>admin</option>
+                              <option selected="selected">guest</option>
+                              <option>standard</option>
+                           </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create user</button>
+                     </div>
+                  </form>
+               </div>
+         </th:block>
+      </div>
+   </body>
+</html>
