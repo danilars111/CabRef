@@ -59,14 +59,100 @@ public class RouteSetup {
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
 		
-		get("/api/entry/:key", (req, res) -> getEntry(req, res, server, config));
+		get("api/cabref", (req, res) -> APIindex(req, res, server, config), engine);
+		get("api/cabref/:key", (req, res) -> APIentryPage(req, res, server), engine);
+		post("api/addNew", (req, res) -> APIaddNewEntry(req, res, server));
+		post("api/importFromDiVa", (req, res) -> APIimportFromDiVa(req, res, server));
+		post("api/export", (req, res) -> APIexport(req, res, server));
+		
+		delete("api/cabref/:key", (req, res) -> APIdeleteEntry(req, res, server));
+		get("api/doDelete/:key", (req, res) -> APIdeleteEntry(req, res, server));
+		post("api/doUpdate/:key", (req, res) -> APIupdateEntry(req, res, server));
+		
+		post("api/adminpage/update/username/:key", (req, res) -> APIeditUsername(req, res, server, config));
+		post("api/adminpage/update/password/:key", (req, res) -> APIeditPassword(req, res, server, config));
+		post("api/adminpage/update/role/:key", (req, res) -> APIeditRole(req, res, server, config));
+		post("api/adminpage/update/create", (req, res) -> APIaddUser(req, res, server, config));
+		get("api/adminpage/delete/:key", (req, res) -> APIdeleteUser(req, res, server, config));
+				
+		get("/api/entry/:key", (req, res) -> APIgetEntry(req, res, server, config));
+		
+	}
+	private static ModelAndView APIindex(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		index(req, res, server, config);		
+		return null;
 	}
 	
-	private static Object getEntry(Request req, Response res, CabRefServer server, Config config) {
+	private static ModelAndView APIentryPage(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		res.redirect("/cabref/" + req.params(":key"));		
+		return null;
+	}
+	
+	private static ModelAndView APIaddNewEntry(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		addNewEntry(req, res, server);		
+		return null;
+	}
+	
+	private static Object APIimportFromDiVa(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		importFromDiVa(req, res, server);
+		
+		return null;
+	}
+
+	private static Object APIexport(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		export(req, res, server);		
+		return null;
+	}
+	
+	private static Object APIdeleteEntry(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		deleteEntry(req, res, server);		
+		return null;
+	}
+	private static Object APIupdateEntry(Request req, Response res, CabRefServer server) {
+		System.out.println("Endpoint requested!");
+		updateEntry(req, res, server);		
+		return null;
+	}
+	private static Object APIeditUsername(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		editUsername(req, res, server, config);
+		return null;
+	}
+	private static Object APIeditPassword(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		editUsername(req, res, server, config);
+		return null;
+	}
+	private static Object APIeditRole(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		editRole(req, res, server, config);
+		return null;
+	}
+	private static Object APIaddUser(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		addUser(req, res, server, config);
+		return null;
+	}
+	private static Object APIdeleteUser(Request req, Response res, CabRefServer server, Config config) {
+		System.out.println("Endpoint requested!");
+		deleteUser(req, res, server, config);
+		return null;
+	}
+	
+	
+	private static Object APIgetEntry(Request req, Response res, CabRefServer server, Config config) {
 		System.out.println("Endpoint requested!");
 		res.body("Works!");
 		return null;
 	}
+	
+
 
 	private static Object editUsername(Request req, Response res, CabRefServer server, Config config) {
 		MongoClient mongoClient = new MongoClient();
