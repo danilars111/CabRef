@@ -42,6 +42,7 @@ public class CabRefConfigFactory implements ConfigFactory {
 		    
 		    if (benchmarkToken.equals(tokenProfileService.getPasswordEncoder().encode(token))) {
 		        MongoProfile profile = tokenProfileService.findById("0");
+		        profile.addRole(tokenProfileService.findById("0").getAttribute("role").toString());
 		        // save in the credentials to be passed to the default AuthenticatorProfileCreator
 		        credentials.setUserProfile(profile);
 		    }
