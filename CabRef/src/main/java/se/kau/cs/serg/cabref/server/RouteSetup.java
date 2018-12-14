@@ -58,7 +58,7 @@ public class RouteSetup {
 		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
-		
+		/*
 		get("/api/cabref", (req, res) -> APIindex(req, res, server, config), engine);
 		get("api/cabref/:key", (req, res) -> APIentryPage(req, res, server), engine);
 		post("api/addNew", (req, res) -> APIaddNewEntry(req, res, server));
@@ -76,8 +76,9 @@ public class RouteSetup {
 		get("api/adminpage/delete/:key", (req, res) -> APIdeleteUser(req, res, server, config));
 				
 		get("/api/entry/:key", (req, res) -> APIgetEntry(req, res, server, config));
-		
+		*/
 	}
+	/*
 	private static ModelAndView APIindex(Request req, Response res, CabRefServer server, Config config) {
 		System.out.println("Endpoint requested!");
 		index(req, res, server, config);		
@@ -152,7 +153,7 @@ public class RouteSetup {
 		return null;
 	}
 	
-
+*/
 
 	private static Object editUsername(Request req, Response res, CabRefServer server, Config config) {
 		MongoClient mongoClient = new MongoClient();
@@ -371,9 +372,8 @@ public class RouteSetup {
 	
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
-		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		final ProfileManager<CommonProfile> manager = new ProfileManager<CommonProfile>(context);
 		System.out.println(manager.get(true).get().getAttributes());
-		manager.get(true).get().addRole(manager.get(true).get().getAttribute("role").toString());
 		return manager.get(true).get();
 	}
 

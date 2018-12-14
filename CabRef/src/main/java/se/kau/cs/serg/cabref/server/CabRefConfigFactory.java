@@ -34,12 +34,14 @@ public class CabRefConfigFactory implements ConfigFactory {
 		standardAuthorizer.setElements("standard", "admin");
 		adminAuthorizer.setElements("admin");
 		
+		String benchmarkToken = tokenProfileService.getPasswordEncoder().encode("GgetQeWVAx");
+		
 		HeaderClient apiClient = new HeaderClient("Authorization", "Bearer ", (credentials, ctx) -> {
-			System.out.println("credentials: " + credentials);
+			//If want to print incoming token: System.out.println("credentials: " + credentials);
 		    String token = ((TokenCredentials) credentials).getToken();
 		    
-		    if ("1234".equals(token)) {
-		        MongoProfile profile = tokenProfileService.findById("1");
+		    if (benchmarkToken.equals(tokenProfileService.getPasswordEncoder().encode(token))) {
+		        MongoProfile profile = tokenProfileService.findById("0");
 		        // save in the credentials to be passed to the default AuthenticatorProfileCreator
 		        credentials.setUserProfile(profile);
 		    }
