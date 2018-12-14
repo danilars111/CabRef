@@ -5,6 +5,8 @@ public class BenchmarkStartup
 {
     public static void main(String[] args)
     {
-        BenchmarkGUI gui = new BenchmarkGUI();
+    	Benchmark benchmark = new Benchmark();
+        BenchmarkGUI gui = new BenchmarkGUI(benchmark);
+        
     }
 }

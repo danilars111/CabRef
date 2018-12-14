@@ -3,15 +3,14 @@ package se.kau.cs.serg.cabrefbenchmark;
 import java.awt.*;
 
 public class BenchmarkGUI extends Frame{
-	Button test;
+	Button runTestBtn;
 	
-	public BenchmarkGUI() {
+	public BenchmarkGUI(Benchmark benchmark) {
 		setTitle("CabRef Benchmark");
 		setLayout(new FlowLayout());
-		/*TODO: Do this for every button */
-		test = new Button("Test");
-		add(test);
-		//TODO: also, when functionality is in place: test.addActionListener(theListener);
+		runTestBtn = new Button("Run test");
+		add(runTestBtn);
+		runTestBtn.addActionListener(benchmark);
 		setSize(250, 100);
 		setVisible(true);
 	}

@@ -59,7 +59,7 @@ public class RouteSetup {
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
 		
-		get("api/cabref", (req, res) -> APIindex(req, res, server, config), engine);
+		get("/api/cabref", (req, res) -> APIindex(req, res, server, config), engine);
 		get("api/cabref/:key", (req, res) -> APIentryPage(req, res, server), engine);
 		post("api/addNew", (req, res) -> APIaddNewEntry(req, res, server));
 		post("api/importFromDiVa", (req, res) -> APIimportFromDiVa(req, res, server));
@@ -372,6 +372,7 @@ public class RouteSetup {
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
 		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		System.out.println(manager.get(true).get().getAttributes());
 		manager.get(true).get().addRole(manager.get(true).get().getAttribute("role").toString());
 		return manager.get(true).get();
 	}
