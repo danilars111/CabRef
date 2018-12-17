@@ -373,6 +373,7 @@ public class RouteSetup {
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
 		final ProfileManager<CommonProfile> manager = new ProfileManager<CommonProfile>(context);
+		manager.get(true).get().addRole(manager.get(true).get().getAttribute("role").toString());
 		System.out.println(manager.get(true).get().getAttributes());
 		return manager.get(true).get();
 	}
