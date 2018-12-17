@@ -40,7 +40,8 @@ public class BenchmarkGUI extends Frame{
 		add(exportEntriesResult);
 
 		runTestBtn.addActionListener(benchmark);
-		setSize(250, 100);
-		setVisible(true);	
+		setSize(250, 100);	
+		this.pack();
+		setVisible(true);
 	}
 }

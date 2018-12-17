@@ -59,7 +59,7 @@ public class Benchmark implements ActionListener {
 		gui.importEntryResult.setText(Long.toString(time/10) + "ms");
 		
 		time = System.currentTimeMillis();
-		sendBulkRequests("/cabref/export?exportFormat=XML", headers, "post");
+		sendBulkRequests("/cabref/export?exportFormat=Bibtex", headers, "post");
 		time = System.currentTimeMillis() - time;
 		gui.exportEntriesResult.setText(Long.toString(time/10) + "ms");
 

@@ -75,7 +75,7 @@ public class CabRefServer {
 
 		// read all data into memory
 		readEntriesFromFile();
-		readUserDataFromFile();
+		//readUserDataFromFile();
 	}
 
 	/**
