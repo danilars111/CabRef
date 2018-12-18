@@ -58,9 +58,8 @@ public class CabRefServer {
 	/**
 	 * The final path that points to the reference file of this server
 	 */
-	private static final String filePath = "src/main/resources/bib/simple-file.bib";
-	
-
+	private static final String filePath = "src/main/resources/bib/kau-articles.bib";
+	private ParserResult parserResult;
 	/**
 	 * The file of accepted users
 	 */
@@ -74,7 +73,7 @@ public class CabRefServer {
 		});
 
 		// read all data into memory
-		readEntriesFromFile();
+		parserResult = readEntriesFromFile();
 		//readUserDataFromFile();
 	}
 
@@ -116,7 +115,6 @@ public class CabRefServer {
 	 *         format
 	 */
 	public List<BibEntryBean> getEntries() {
-		ParserResult parserResult = readEntriesFromFile();
 
 		List<BibEntryBean> entries = new LinkedList<>();
 		for (BibEntry entry : parserResult.getDatabase().getEntries()) {
@@ -145,7 +143,6 @@ public class CabRefServer {
 	 *         empty bean if no data could be found for this key
 	 */
 	public BibEntryBean getEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		return new BibEntryBean(parserResult.getDatabase().getEntryByKey(key).orElse(new BibEntry()));
 	}
@@ -158,7 +155,6 @@ public class CabRefServer {
 	 *            the citation key for which the data should be removed
 	 */
 	public synchronized void deleteEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		Optional<BibEntry> entry = parserResult.getDatabase().getEntryByKey(key);
 		if (entry.isPresent()) {
@@ -190,7 +186,6 @@ public class CabRefServer {
 	 */
 	public synchronized void updateEntry(String key, String type, String author, String title, String journal,
 			String volume, String number, String year) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(key);
 
@@ -218,7 +213,6 @@ public class CabRefServer {
 	 *            the new key to be added
 	 */
 	public synchronized void addNewEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		BibEntry entry = new BibEntry();
 		entry.setCiteKey(key);
@@ -254,7 +248,6 @@ public class CabRefServer {
 			return null;
 		}
 		
-		ParserResult parserResult = readEntriesFromFile();
 		List<BibEntry> entries = parserResult.getDatabase().getEntriesByKey(newEntry.getCiteKey()); 
 		
 		if(entries.isEmpty()) {
@@ -274,7 +267,6 @@ public class CabRefServer {
 	
 	public synchronized void export(String format, Response res) 
 	{
-		ParserResult parserResult = readEntriesFromFile();
 		BibDatabaseContext context = parserResult.getDatabaseContext();		
 		String exportString;		
 		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
