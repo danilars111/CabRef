@@ -58,7 +58,7 @@ public class CabRefServer {
 	/**
 	 * The final path that points to the reference file of this server
 	 */
-	private static final String filePath = "src/main/resources/bib/kau-articles.bib";
+	private static final String filePath = "src/main/resources/bib/simple-file.bib";
 	private ParserResult parserResult;
 	/**
 	 * The file of accepted users
@@ -159,7 +159,6 @@ public class CabRefServer {
 		Optional<BibEntry> entry = parserResult.getDatabase().getEntryByKey(key);
 		if (entry.isPresent()) {
 			parserResult.getDatabase().removeEntry(entry.get());
-			writeDataToDisk(parserResult.getDatabaseContext());
 		}
 
 	}
@@ -199,7 +198,6 @@ public class CabRefServer {
 			entry.setField(FieldName.NUMBER, number);
 			entry.setField(FieldName.YEAR, year);
 
-			writeDataToDisk(parserResult.getDatabaseContext());
 
 			return;
 		}
@@ -218,7 +216,6 @@ public class CabRefServer {
 		entry.setCiteKey(key);
 		parserResult.getDatabase().insertEntry(entry);
 
-		writeDataToDisk(parserResult.getDatabaseContext());
 	}
 
 	/**
@@ -235,6 +232,10 @@ public class CabRefServer {
 		} catch (SaveException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void save() {
+		writeDataToDisk(parserResult.getDatabaseContext());
 	}
 	
 	public synchronized String importFromDiVa(String id)
@@ -255,7 +256,6 @@ public class CabRefServer {
 			parserResult.getDatabase().insertEntry(newEntry);
 			
 		
-			writeDataToDisk(parserResult.getDatabaseContext()); 
 			return newEntry.getCiteKey().toString();
 		}
 		else 

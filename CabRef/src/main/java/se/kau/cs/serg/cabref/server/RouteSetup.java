@@ -44,6 +44,7 @@ public class RouteSetup {
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
 		post("/cabref/importFromDiVa", (req, res) -> importFromDiVa(req, res, server));
 		post("/cabref/export", (req, res) -> export(req, res, server));
+		get("/save", (req, res) -> save(req, res, server));
 
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		get("/cabref/doDelete/:key", (req, res) -> deleteEntry(req, res, server));
@@ -58,6 +59,12 @@ public class RouteSetup {
 		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
+	}
+
+	private static Object save(Request req, Response res, CabRefServer server) {
+		server.save();
+		res.redirect("/cabref");
+		return null;
 	}
 
 	private static Object editUsername(Request req, Response res, CabRefServer server, Config config) {

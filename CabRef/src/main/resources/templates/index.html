@@ -57,6 +57,12 @@
    <input type="hidden" name="login" th:value="${login}"/>
 </form>
 
+<form th:action="@{save}" method="get">
+   <p>
+      <input type="submit" value="Save" class="btn btn-info"/>
+   </p>
+</form>
+
 <h2>List of Literature Entries</h2>
 <table class="table">
   <tr>
