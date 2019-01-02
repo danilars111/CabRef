@@ -7,6 +7,5 @@ public class BenchmarkStartup
     {
     	Benchmark benchmark = new Benchmark();
         BenchmarkGUI gui = new BenchmarkGUI(benchmark);
-        
     }
 }

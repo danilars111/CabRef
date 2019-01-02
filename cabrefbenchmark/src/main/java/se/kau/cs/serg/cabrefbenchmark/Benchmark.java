@@ -62,8 +62,6 @@ public class Benchmark implements ActionListener {
 		sendBulkRequests("/cabref/export?exportFormat=Bibtex", headers, "post");
 		time = System.currentTimeMillis() - time;
 		gui.exportEntriesResult.setText(Long.toString(time/10) + "ms");
-
-		
 	}
 	
 	private void sendBulkRequests(String urlString, Map<String, String> headers, String method) {
