@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jabref.model.EntryTypes;
+import org.jabref.model.entry.BiblatexEntryType;
+import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -49,6 +54,7 @@ public class RouteSetup {
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		get("/cabref/doDelete/:key", (req, res) -> deleteEntry(req, res, server));
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
+		post("/cabref/changeType/:key", (req, res) -> changeEntryType(req, res, server));
 		
 		get("/login", (req, res) -> login(req, res, server, config), engine);
 		get("/logout", (req, res) -> logout(req, res));
@@ -59,6 +65,12 @@ public class RouteSetup {
 		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
+	}
+
+	private static Object changeEntryType(Request req, Response res, CabRefServer server) {
+		server.changeEntryType(req.params(":key"), req.queryParams("type"));
+		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
+		return "";
 	}
 
 	private static Object save(Request req, Response res, CabRefServer server) {
@@ -234,8 +246,17 @@ public class RouteSetup {
 
 	private static ModelAndView entryPage(Request req, Response res, CabRefServer server) {
 		Map<String, Object> model = new HashMap<>();
+		List<String> fields = new ArrayList<>();
+		
+		if(server.getEntry(req.params(":key")).getType().equalsIgnoreCase("Inproceedings")) {
+			fields = BibtexEntryTypes.INPROCEEDINGS.getAllFields();
+		} else {
+			fields = BibtexEntryTypes.ARTICLE.getAllFields();
+		}
 		model.put("login", req.queryParams("login"));
 		model.put("entry", server.getEntry(req.params(":key")));
+		model.put("types", server.getTypes());
+		model.put("fields", fields);
 		return new ModelAndView(model, "entryPage");
 	}
 	
@@ -275,9 +296,14 @@ public class RouteSetup {
 	}
 
 	private static Object updateEntry(Request req, Response res, CabRefServer server) {
+		//If req.params(":XXX") is null, set to "" and send to updateEntry
+		System.out.println(req.queryParams());
 		server.updateEntry(req.params(":key"), req.queryParams("type"), req.queryParams("author"),
 				req.queryParams("title"), req.queryParams("journal"), req.queryParams("volume"),
-				req.queryParams("number"), req.queryParams("year"));
+				req.queryParams("number"), req.queryParams("year"), req.queryParams("booktitle"),
+				req.queryParams("editor"), req.queryParams("series"), req.queryParams("pages"),
+				req.queryParams("address"), req.queryParams("month"), req.queryParams("organization"),
+				req.queryParams("publisher"), req.queryParams("issn"), req.queryParams("note"));
 		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
 		return "";
 	}

@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,9 +66,10 @@ public class CabRefServer {
 	 * The file of accepted users
 	 */
 	private List<String> users;
+	private List<String> types;
+	
 
 	public CabRefServer() {
-
 		// in case anything goes wrong, be sure to print the errors
 		Spark.exception(Exception.class, (exception, request, response) -> {
 			exception.printStackTrace();
@@ -74,7 +77,11 @@ public class CabRefServer {
 
 		// read all data into memory
 		parserResult = readEntriesFromFile();
-		//readUserDataFromFile();
+		
+		// add types
+		types = new ArrayList<>();
+		types.add("article");
+		types.add("inproceedings");
 	}
 
 	/**
@@ -184,21 +191,48 @@ public class CabRefServer {
 	 *            the new year of the entry
 	 */
 	public synchronized void updateEntry(String key, String type, String author, String title, String journal,
-			String volume, String number, String year) {
+			String volume, String number, String year, String booktitle, String editor, String series,
+			String pages, String address, String month, String organization, String publisher, String issn, String note) {
 
 		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(key);
+		
+		title = (title == null) ? "" : title;
+		author = (author == null) ? "" : author;
+		journal = (journal == null) ? "" : journal;
+		volume = (volume == null) ? "" : volume;
+		number = (number == null) ? "" : number;
+		year = (year == null) ? "" : year;
+		booktitle = (booktitle == null) ? "" : booktitle;
+		editor = (editor == null) ? "" : editor;
+		series = (series == null) ? "" : series;
+		pages = (pages == null) ? "" : pages;
+		address = (address == null) ? "" : address;
+		month = (month == null) ? "" : month;
+		organization = (organization == null) ? "" : organization;
+		publisher = (publisher == null) ? "" : publisher;
+		issn = (issn == null) ? "" : issn;
+		note = (note == null) ? "" : note;
 
 		if (optionalEntry.isPresent()) {
 			BibEntry entry = optionalEntry.get();
-			entry.setType(type);
 			entry.setField(FieldName.AUTHOR, author);
 			entry.setField(FieldName.TITLE, title);
 			entry.setField(FieldName.JOURNAL, journal);
 			entry.setField(FieldName.VOLUME, volume);
 			entry.setField(FieldName.NUMBER, number);
 			entry.setField(FieldName.YEAR, year);
-
-
+			
+			entry.setField(FieldName.BOOKTITLE, booktitle);
+			entry.setField(FieldName.EDITOR, editor);
+			entry.setField(FieldName.SERIES, series);
+			entry.setField(FieldName.PAGES, pages);
+			entry.setField(FieldName.ADDRESS, address);
+			entry.setField(FieldName.MONTH, month);
+			entry.setField(FieldName.ORGANIZATION, organization);
+			entry.setField(FieldName.PUBLISHER, publisher);
+			entry.setField(FieldName.ISSN, issn);
+			entry.setField(FieldName.NOTE, note);
+			
 			return;
 		}
 
@@ -308,6 +342,21 @@ public class CabRefServer {
 	{
 		String s = username + ":" + password;
 		return authenticate(s);
+	}
+	
+	public List<String> getTypes(){
+		return types;
+	}
+
+	public void changeEntryType(String key, String type) {
+		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(key);
+		
+		if (optionalEntry.isPresent()) {
+			BibEntry entry = optionalEntry.get();
+			entry.setType(type);
+			return;
+		}
+		
 	}
 
 }

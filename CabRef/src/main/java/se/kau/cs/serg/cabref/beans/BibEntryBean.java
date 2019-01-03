@@ -45,6 +45,8 @@ public class BibEntryBean {
 	private String organization;
 
 	private String publisher;
+	
+	private String issn;
 
 	private String note;
 
@@ -65,6 +67,7 @@ public class BibEntryBean {
 		month = "";
 		organization = "";
 		publisher = "";
+		issn = "";
 		note = "";
 	}
 
@@ -85,6 +88,7 @@ public class BibEntryBean {
 		this.month = entry.getFieldOrAliasLatexFree(FieldName.MONTH).orElse("");
 		this.organization = entry.getFieldOrAliasLatexFree(FieldName.ORGANIZATION).orElse("");
 		this.publisher = entry.getFieldOrAliasLatexFree(FieldName.PUBLISHER).orElse("");
+		this.issn = entry.getFieldOrAliasLatexFree(FieldName.ISSN).orElse("");
 		this.note = entry.getFieldOrAliasLatexFree(FieldName.NOTE).orElse("");
 }
 
@@ -153,6 +157,10 @@ public class BibEntryBean {
 	}
 
 	public String getPublisher() {
+		return publisher;
+	}
+	
+	public String getISSN() {
 		return publisher;
 	}
 
