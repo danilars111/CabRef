@@ -5,17 +5,10 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.jabref.model.EntryTypes;
-import org.jabref.model.entry.BiblatexEntryType;
-import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
@@ -247,12 +240,9 @@ public class RouteSetup {
 	private static ModelAndView entryPage(Request req, Response res, CabRefServer server) {
 		Map<String, Object> model = new HashMap<>();
 		List<String> fields = new ArrayList<>();
+	
+		fields = server.getFields(server.getEntry(req.params(":key")).getType());
 		
-		if(server.getEntry(req.params(":key")).getType().equalsIgnoreCase("Inproceedings")) {
-			fields = BibtexEntryTypes.INPROCEEDINGS.getAllFields();
-		} else {
-			fields = BibtexEntryTypes.ARTICLE.getAllFields();
-		}
 		model.put("login", req.queryParams("login"));
 		model.put("entry", server.getEntry(req.params(":key")));
 		model.put("types", server.getTypes());
@@ -296,14 +286,16 @@ public class RouteSetup {
 	}
 
 	private static Object updateEntry(Request req, Response res, CabRefServer server) {
-		//If req.params(":XXX") is null, set to "" and send to updateEntry
-		System.out.println(req.queryParams());
-		server.updateEntry(req.params(":key"), req.queryParams("type"), req.queryParams("author"),
-				req.queryParams("title"), req.queryParams("journal"), req.queryParams("volume"),
-				req.queryParams("number"), req.queryParams("year"), req.queryParams("booktitle"),
-				req.queryParams("editor"), req.queryParams("series"), req.queryParams("pages"),
-				req.queryParams("address"), req.queryParams("month"), req.queryParams("organization"),
-				req.queryParams("publisher"), req.queryParams("issn"), req.queryParams("note"));
+		HashMap<String, String> fields = new HashMap<String, String>();
+		
+		fields.put("key", req.params(":key"));
+		fields.put("bibtexkey", req.params(":key"));
+		for(String queryParam : req.queryParams()) {
+			fields.put(queryParam, req.queryParams(queryParam));
+		}
+		
+		server.updateEntry(fields);
+		
 		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
 		return "";
 	}
