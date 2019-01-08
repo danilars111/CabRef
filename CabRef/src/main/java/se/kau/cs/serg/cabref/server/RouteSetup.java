@@ -5,11 +5,9 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.CommonProfile;
@@ -44,10 +42,12 @@ public class RouteSetup {
 		post("/cabref/addNew", (req, res) -> addNewEntry(req, res, server));
 		post("/cabref/importFromDiVa", (req, res) -> importFromDiVa(req, res, server));
 		post("/cabref/export", (req, res) -> export(req, res, server));
+		get("/save", (req, res) -> save(req, res, server));
 
 		delete("/cabref/:key", (req, res) -> deleteEntry(req, res, server));
 		get("/cabref/doDelete/:key", (req, res) -> deleteEntry(req, res, server));
 		post("/cabref/doUpdate/:key", (req, res) -> updateEntry(req, res, server));
+		post("/cabref/changeType/:key", (req, res) -> changeEntryType(req, res, server));
 		
 		get("/login", (req, res) -> login(req, res, server, config), engine);
 		get("/logout", (req, res) -> logout(req, res));
@@ -58,13 +58,17 @@ public class RouteSetup {
 		post("/adminpage/update/role/:key", (req, res) -> editRole(req, res, server, config));
 		post("/adminpage/update/create", (req, res) -> addUser(req, res, server, config));
 		get("/adminpage/delete/:key", (req, res) -> deleteUser(req, res, server, config));
-		
-		get("/api/entry/:key", (req, res) -> getEntry(req, res, server, config));
 	}
-	
-	private static Object getEntry(Request req, Response res, CabRefServer server, Config config) {
-		System.out.println("Endpoint requested!");
-		res.body("Works!");
+
+	private static Object changeEntryType(Request req, Response res, CabRefServer server) {
+		server.changeEntryType(req.params(":key"), req.queryParams("type"));
+		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
+		return "";
+	}
+
+	private static Object save(Request req, Response res, CabRefServer server) {
+		server.save();
+		res.redirect("/cabref");
 		return null;
 	}
 
@@ -235,8 +239,14 @@ public class RouteSetup {
 
 	private static ModelAndView entryPage(Request req, Response res, CabRefServer server) {
 		Map<String, Object> model = new HashMap<>();
+		List<String> fields = new ArrayList<>();
+	
+		fields = server.getFields(server.getEntry(req.params(":key")).getType());
+		
 		model.put("login", req.queryParams("login"));
 		model.put("entry", server.getEntry(req.params(":key")));
+		model.put("types", server.getTypes());
+		model.put("fields", fields);
 		return new ModelAndView(model, "entryPage");
 	}
 	
@@ -276,17 +286,25 @@ public class RouteSetup {
 	}
 
 	private static Object updateEntry(Request req, Response res, CabRefServer server) {
-		server.updateEntry(req.params(":key"), req.queryParams("type"), req.queryParams("author"),
-				req.queryParams("title"), req.queryParams("journal"), req.queryParams("volume"),
-				req.queryParams("number"), req.queryParams("year"));
+		HashMap<String, String> fields = new HashMap<String, String>();
+		
+		fields.put("key", req.params(":key"));
+		fields.put("bibtexkey", req.params(":key"));
+		for(String queryParam : req.queryParams()) {
+			fields.put(queryParam, req.queryParams(queryParam));
+		}
+		
+		server.updateEntry(fields);
+		
 		res.redirect("/cabref/" + req.params(":key") + "?login=" + req.queryParams("login"));
 		return "";
 	}
 	
 	private static CommonProfile getProfile(Request req, Response res) {
 		final SparkWebContext context = new SparkWebContext(req, res);
-		final ProfileManager<CommonProfile> manager = new ProfileManager(context);
+		final ProfileManager<CommonProfile> manager = new ProfileManager<CommonProfile>(context);
 		manager.get(true).get().addRole(manager.get(true).get().getAttribute("role").toString());
+		System.out.println(manager.get(true).get().getAttributes());
 		return manager.get(true).get();
 	}
 

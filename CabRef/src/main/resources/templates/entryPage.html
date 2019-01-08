@@ -8,23 +8,31 @@
 </head>
 <body>
 <div class="container">
-<h1 th:inline="text">Entry page for [[${entry.key}]]</h1>
-<form th:action="@{'doUpdate/'+${entry.key}}" method="post">
+<h1 th:inline="text">Entry page for [[${entry.key}]] [[${entry.type}]]</h1>
+
+<form th:action="@{'changeType/'+${entry.key}}" method="post">
+   <p>Type:
+<div class="form-group">
+   <select class="form-control" id="type" name="type">
+         <option th:each="type : ${types}" th:value="${type}" th:text="${#strings.capitalizeWords(type)}"
+            th:selected="${type==entry.type}"></option>
+   </select>
+   </p>
+   <input type="submit" value="Change type" class="btn btn-info" />
+</div>
+</form>
+
+<form th:action="@{'doUpdate/'+${entry.key}}" th:object="${entry}" method="post">
 <div class="form-group">
    <p>Key: <input type="text" name="key" th:value="${entry.key}" disabled="disabled" class="form-control"/></p>
-   <p>Type: <input type="text" name="type" th:value="${entry.type}" class="form-control"/></p>
-   <p>Author: <input type="text" name="author" th:value="${entry.author}" class="form-control"/></p>
-   <p>Title: <input type="text" name="title" th:value="${entry.title}" class="form-control"/></p>
-   <p>Journal: <input type="text" name="journal" th:value="${entry.journal}" class="form-control"/></p>
-   <p>Volume: <input type="text" name="volume" th:value="${entry.volume}" class="form-control"/></p>
-   <p>Number: <input type="text" name="number" th:value="${entry.number}" class="form-control"/></p>
-   <p>Year: <input type="text" name="year" th:value="${entry.year}" class="form-control"/></p>
-   <input type="hidden" name="login" th:value="${login}" />
+   <th:block th:each="field : ${fields}">
+      <p th:inline="text">[[${#strings.capitalizeWords(field)}]]: <input type="text" th:name="${field}" th:value="*{__${field}__}" class="form-control"></p>
+   </th:block>
    <input type="submit" value="Update" class="btn btn-info" />
 </div>
 </form>
 <p><a th:href="@{'doDelete/'+${entry.key}}" class="btn btn-info"><span>Delete</span></a></p>
-<p><a href="http://localhost:4567/cabref" class="btn btn-info"><span>Back</span></a></p>
+<p><a th:href="@{'../cabref'}" class="btn btn-info"><span>Back</span></a></p>
 </div>
 </body>
 </html>

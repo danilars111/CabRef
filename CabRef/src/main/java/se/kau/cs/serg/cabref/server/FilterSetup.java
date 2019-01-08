@@ -13,12 +13,8 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 public class FilterSetup {
 
 	public static void setupFilters(CabRefServer server, ThymeleafTemplateEngine engine, Config config) {
-		// filter for authenticating any request
-		before("/cabref", new SecurityFilter(config, "FormClient"));
-		before("/cabref/*", new SecurityFilter(config, "FormClient", "standardAuthorizer"));
-		before("/adminpage/*", new SecurityFilter(config, "FormClient", "adminAuthorizer"));
-		//API endpoint filters
-		before("/api/*", new SecurityFilter(config, "HeaderClient"));
-
+		before("/cabref", new SecurityFilter(config, "FormClient,HeaderClient"));
+		before("/cabref/*", new SecurityFilter(config, "FormClient,HeaderClient", "standardAuthorizer"));
+		before("/adminpage/*", new SecurityFilter(config, "FormClient,HeaderClient", "adminAuthorizer"));
 	}	
 }

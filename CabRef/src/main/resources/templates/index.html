@@ -57,6 +57,12 @@
    <input type="hidden" name="login" th:value="${login}"/>
 </form>
 
+<form th:action="@{save}" method="get">
+   <p>
+      <input type="submit" value="Save" class="btn btn-info"/>
+   </p>
+</form>
+
 <h2>List of Literature Entries</h2>
 <table class="table">
   <tr>
@@ -64,6 +70,7 @@
     <th>Type</th>
     <th>Author</th>
     <th>Title</th>
+    <th>Book Title</th>
     <th>Journal</th>
     <th>Volume</th>
     <th>Number</th>
@@ -74,6 +81,7 @@
     <td th:text="${entry.type}">article</td>
     <td th:text="${entry.author}">author</td>
     <td th:text="${entry.title}">title</td>
+    <td th:text="${entry.booktitle}">booktitle</td>
     <td th:text="${entry.journal}">journal</td>
     <td th:text="${entry.volume}">volume</td>
     <td th:text="${entry.number}">number</td>

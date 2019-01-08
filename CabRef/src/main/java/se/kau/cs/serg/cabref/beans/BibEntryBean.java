@@ -1,9 +1,9 @@
 package se.kau.cs.serg.cabref.beans;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 
 /**
  * Adapter class that takes information from a BibEntry instance from JabRef and
@@ -13,42 +13,21 @@ import org.jabref.model.entry.FieldName;
  */
 public class BibEntryBean {
 
-	private String key;
+	private HashMap<String, String> fields;
 
-	private String type;
-
-	private String author;
-
-	private String journal;
-
-	private String year;
-
-	private String title;
-
-	private String volume;
-
-	private String number;
 
 	public BibEntryBean() {
-		key = "";
-		type = "";
-		author = "";
-		journal = "";
-		year = "";
-		title = "";
-		volume = "";
-		number = "";
+		fields = new HashMap<String, String>();
 	}
 
 	public BibEntryBean(BibEntry entry) {
-		this.key = entry.getCiteKeyOptional().orElse("");
-		this.type = entry.getType();
-		this.author = entry.getFieldOrAliasLatexFree(FieldName.AUTHOR).orElse("");
-		this.journal = entry.getFieldOrAliasLatexFree(FieldName.JOURNAL).orElse("");
-		this.year = entry.getFieldOrAliasLatexFree(FieldName.YEAR).orElse("");
-		this.title = entry.getFieldOrAliasLatexFree(FieldName.TITLE).orElse("");
-		this.volume = entry.getFieldOrAliasLatexFree(FieldName.VOLUME).orElse("");
-		this.number = entry.getFieldOrAliasLatexFree(FieldName.NUMBER).orElse("");
+		fields = new HashMap<String, String>();
+		fields.put("key", entry.getCiteKeyOptional().orElse(""));
+		fields.put("type", entry.getType());
+		
+		for(Entry<String, String> entryField : entry.getFieldMap().entrySet()) {
+			fields.put(entryField.getKey(), entry.getFieldOrAliasLatexFree(entryField.getKey()).orElse(""));
+		}
 	}
 
 	public BibEntryBean(HashMap<String, String> values) {
@@ -56,35 +35,75 @@ public class BibEntryBean {
 	}
 
 	public String getAuthor() {
-		return author;
+		return fields.get("author");
 	}
 
 	public String getJournal() {
-		return journal;
+		return fields.get("journal");
 	}
 
 	public String getYear() {
-		return year;
+		return fields.get("year");
 	}
 
 	public String getTitle() {
-		return title;
+		return fields.get("title");
+	}
+	
+	public String getBookTitle() {
+		return fields.get("booktitle");
 	}
 
 	public String getVolume() {
-		return volume;
+		return fields.get("volume");
 	}
 
 	public String getNumber() {
-		return number;
+		return fields.get("number");
 	}
 
 	public String getKey() {
-		return key;
+		return fields.get("key");
 	}
 
 	public String getType() {
-		return type;
+		return fields.get("type");
+	}
+	
+	public String getEditor() {
+		return fields.get("editor");
+	}
+
+	public String getSeries() {
+		return fields.get("series");
+	}
+
+	public String getPages() {
+		return fields.get("pages");
+	}
+
+	public String getAddress() {
+		return fields.get("address");
+	}
+
+	public String getMonth() {
+		return fields.get("month");
+	}
+
+	public String getOrganization() {
+		return fields.get("organization");
+	}
+
+	public String getPublisher() {
+		return fields.get("publisher");
+	}
+	
+	public String getISSN() {
+		return fields.get("issn");
+	}
+
+	public String getNote() {
+		return fields.get("note");
 	}
 
 }

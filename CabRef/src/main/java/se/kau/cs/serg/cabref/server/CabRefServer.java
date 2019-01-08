@@ -1,53 +1,36 @@
 package se.kau.cs.serg.cabref.server;
 
-import java.beans.Encoder;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.jabref.Globals;
 import org.jabref.gui.exporter.BibtexExportFormat;
-import org.jabref.gui.exporter.ExportAction;
 import org.jabref.logic.exporter.BibTeXMLExportFormat;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.SaveSession;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.preferences.JabRefPreferences;
 
 import se.kau.cs.serg.cabref.beans.BibEntryBean;
 import spark.Response;
 import spark.Spark;
-import org.jsoup.*;
-import org.jsoup.nodes.*;
-import org.jsoup.select.Elements;
+
 
 /**
  * Central server class that builds on JabRef and processes requests
@@ -59,37 +42,30 @@ public class CabRefServer {
 	 * The final path that points to the reference file of this server
 	 */
 	private static final String filePath = "src/main/resources/bib/simple-file.bib";
-	
-
+	private ParserResult parserResult;
 	/**
 	 * The file of accepted users
 	 */
 	private List<String> users;
+	private HashMap<String, List<String>> fields;
+	
 
 	public CabRefServer() {
-
 		// in case anything goes wrong, be sure to print the errors
 		Spark.exception(Exception.class, (exception, request, response) -> {
 			exception.printStackTrace();
 		});
 
 		// read all data into memory
-		readEntriesFromFile();
-		readUserDataFromFile();
+		parserResult = readEntriesFromFile();
+		
+		// add types and fields
+		// CAUSION: Always add type names with lower case, i.e. "article" or "book"
+		fields = new HashMap<String, List<String>>();
+		fields.put("article", BibtexEntryTypes.ARTICLE.getAllFields());
+		fields.put("inproceedings", BibtexEntryTypes.INPROCEEDINGS.getAllFields());
 	}
-
-	/**
-	 * Parses the user file. Gives an empty list if the file could not be parsed
-	 */
-	private void readUserDataFromFile() {
-		try {
-			users = Files.readAllLines(Paths.get("src/main/resources/config/users.txt"));
-		} catch (IOException e) {
-			System.out.println("Could not read users file");
-			users = new LinkedList<>();
-		}
-	}
-
+	
 	/**
 	 * Reads all entries from the database of this server or an empty result if
 	 * the data could not be parsed
@@ -116,7 +92,6 @@ public class CabRefServer {
 	 *         format
 	 */
 	public List<BibEntryBean> getEntries() {
-		ParserResult parserResult = readEntriesFromFile();
 
 		List<BibEntryBean> entries = new LinkedList<>();
 		for (BibEntry entry : parserResult.getDatabase().getEntries()) {
@@ -145,7 +120,6 @@ public class CabRefServer {
 	 *         empty bean if no data could be found for this key
 	 */
 	public BibEntryBean getEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		return new BibEntryBean(parserResult.getDatabase().getEntryByKey(key).orElse(new BibEntry()));
 	}
@@ -158,12 +132,10 @@ public class CabRefServer {
 	 *            the citation key for which the data should be removed
 	 */
 	public synchronized void deleteEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		Optional<BibEntry> entry = parserResult.getDatabase().getEntryByKey(key);
 		if (entry.isPresent()) {
 			parserResult.getDatabase().removeEntry(entry.get());
-			writeDataToDisk(parserResult.getDatabaseContext());
 		}
 
 	}
@@ -188,27 +160,15 @@ public class CabRefServer {
 	 * @param year
 	 *            the new year of the entry
 	 */
-	public synchronized void updateEntry(String key, String type, String author, String title, String journal,
-			String volume, String number, String year) {
-		ParserResult parserResult = readEntriesFromFile();
-
-		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(key);
-
-		if (optionalEntry.isPresent()) {
-			BibEntry entry = optionalEntry.get();
-			entry.setType(type);
-			entry.setField(FieldName.AUTHOR, author);
-			entry.setField(FieldName.TITLE, title);
-			entry.setField(FieldName.JOURNAL, journal);
-			entry.setField(FieldName.VOLUME, volume);
-			entry.setField(FieldName.NUMBER, number);
-			entry.setField(FieldName.YEAR, year);
-
-			writeDataToDisk(parserResult.getDatabaseContext());
-
-			return;
+	
+	public synchronized void updateEntry(HashMap<String, String> updatedFields) {
+		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(updatedFields.get("key"));
+		
+		for(Map.Entry<String, String> entryField : optionalEntry.get().getFieldMap().entrySet()) {
+			entryField.setValue("");
 		}
-
+		
+		optionalEntry.get().setField(updatedFields);		
 	}
 
 	/**
@@ -218,13 +178,11 @@ public class CabRefServer {
 	 *            the new key to be added
 	 */
 	public synchronized void addNewEntry(String key) {
-		ParserResult parserResult = readEntriesFromFile();
 
 		BibEntry entry = new BibEntry();
 		entry.setCiteKey(key);
 		parserResult.getDatabase().insertEntry(entry);
 
-		writeDataToDisk(parserResult.getDatabaseContext());
 	}
 
 	/**
@@ -243,6 +201,10 @@ public class CabRefServer {
 		}
 	}
 	
+	public void save() {
+		writeDataToDisk(parserResult.getDatabaseContext());
+	}
+	
 	public synchronized String importFromDiVa(String id)
 	{	
 		JabRefPreferences jrp = JabRefPreferences.getInstance();
@@ -254,27 +216,24 @@ public class CabRefServer {
 			return null;
 		}
 		
-		ParserResult parserResult = readEntriesFromFile();
-		List<BibEntry> entries = parserResult.getDatabase().getEntriesByKey(newEntry.getCiteKey()); 
+		List<BibEntry> entries = parserResult.getDatabase().getEntriesByKey(newEntry.getCiteKeyOptional().get()); 
 		
 		if(entries.isEmpty()) {
 		
 			parserResult.getDatabase().insertEntry(newEntry);
 			
 		
-			writeDataToDisk(parserResult.getDatabaseContext()); 
-			return newEntry.getCiteKey().toString();
+			return newEntry.getCiteKeyOptional().get().toString();
 		}
 		else 
 		{
-			return newEntry.getCiteKey().toString();
+			return newEntry.getCiteKeyOptional().get().toString();
 		}
 		
 	}
 	
 	public synchronized void export(String format, Response res) 
 	{
-		ParserResult parserResult = readEntriesFromFile();
 		BibDatabaseContext context = parserResult.getDatabaseContext();		
 		String exportString;		
 		BibTeXMLExportFormat XMLformat = new BibTeXMLExportFormat();
@@ -316,6 +275,27 @@ public class CabRefServer {
 	{
 		String s = username + ":" + password;
 		return authenticate(s);
+	}
+	
+	public List<String> getTypes(){
+		List<String> types = new ArrayList<String>();
+		types.addAll(fields.keySet());
+		return types;
+	}
+	
+	public List<String> getFields(String type){
+		return fields.get(type.toLowerCase());
+	}
+
+	public void changeEntryType(String key, String type) {
+		Optional<BibEntry> optionalEntry = parserResult.getDatabase().getEntryByKey(key);
+		
+		if (optionalEntry.isPresent()) {
+			BibEntry entry = optionalEntry.get();
+			entry.setType(type);
+			return;
+		}
+		
 	}
 
 }
